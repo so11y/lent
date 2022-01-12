@@ -8,6 +8,9 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const typescript_1 = __importDefault(require("typescript"));
 const cheerio_1 = __importDefault(require("cheerio"));
+const es_module_lexer_1 = require("es-module-lexer");
+const ws_1 = require("ws");
+const chokidar_1 = __importDefault(require("chokidar"));
 const Router = () => {
     const routers = new Set();
     return {
@@ -30,6 +33,55 @@ const plugins = () => {
         }
     };
 };
+const depends = () => {
+    const dependGraph = new Map();
+    return {
+        getGraph: () => dependGraph,
+        getDepend: (fileName) => (dependGraph.get(fileName)),
+        addDepend(fileName, childFileName) {
+            if (dependGraph.has(fileName)) {
+                dependGraph.get(fileName).add(childFileName);
+            }
+            else {
+                dependGraph.set(fileName, new Set([childFileName]));
+            }
+        }
+    };
+};
+const createWatchFile = (handleFile) => {
+    const watcher = chokidar_1.default.watch([], {
+        ignored: ["**/node_modules/**", "**/.git/**"],
+        persistent: true
+    }).on("change", handleFile.change);
+    return watcher;
+};
+const handleWatchFile = (i) => {
+    return {
+        change(file, state) {
+            i.socket.sendSocket({ fileName: file, hot: true });
+        }
+    };
+};
+const createWss = () => {
+    const webSocket = new ws_1.WebSocketServer({
+        noServer: true
+    });
+    let socket_ = null;
+    const sendSocket = (v) => {
+        socket_.send(JSON.stringify(v));
+    };
+    webSocket.on('connection', (socket) => {
+        socket_ = socket;
+        socket.send(JSON.stringify({ type: 'connected' }));
+        socket.on("message", (msg) => {
+            console.log(msg, "msg");
+        });
+    });
+    return {
+        webSocket,
+        sendSocket
+    };
+};
 const isHaveFile = (requireName) => {
     const filePath = path_1.default.join(process.cwd(), requireName);
     if (fs_1.default.existsSync(filePath)) {
@@ -49,45 +101,70 @@ const findFile = (requireName, fileExit) => {
     }
     return "";
 };
-const transform = (req, plugins) => {
+const transform = (req, plugins, viteHttpInstance) => {
     const filePath = findFile(req.url, ['.js', '.ts', '.tsx', '.css']);
-    const plugin = plugins().find(v => req.url.endsWith(v.exit) || filePath.endsWith(v.exit));
-    if (filePath && plugin) {
-        return plugin.transform(fs_1.default.readFileSync(filePath).toString(), req.url);
+    const filterplugins = plugins().filter(v => {
+        if (req.url.endsWith(v.exit) || filePath.endsWith(v.exit)) {
+            return true;
+        }
+        else if (v.exits?.some(vv => req.url.includes(vv) || filePath.endsWith(vv))) {
+            return true;
+        }
+    });
+    if (filePath && filterplugins.length) {
+        const fileData = fs_1.default.readFileSync(filePath).toString();
+        const fileUrl = {
+            filePath,
+            requestUrl: req.url
+        };
+        plugins().filter(v => v.enforce === "post").forEach(v => v.handle(fileData, fileUrl, viteHttpInstance));
+        return filterplugins.reduce((prev, next) => prev.then(value => next.transform(value, fileUrl, viteHttpInstance)), Promise.resolve(fileData));
     }
-    return null;
+    return Promise.resolve(null);
 };
 const createHttp_ = (viteInstance) => {
     const http = http_1.default.createServer();
     return {
-        http() { (http); },
+        http: () => (http),
         start() {
+            http.on("upgrade", (req, socket, head) => {
+                console.log("--upgrade--");
+                viteInstance.socket.webSocket.handleUpgrade(req, socket, head, (ws) => {
+                    viteInstance.socket.webSocket.emit('connection', ws, req);
+                });
+            });
             http.on("request", (req, res) => {
                 const item = viteInstance.router.getRouters().find((v) => v.path === req.url);
                 const plugins = viteInstance.plugin;
                 if (item) {
                     const indexHtmlPlugin = plugins.getPlugins().find(v => v.name === "indexHtml");
                     if (indexHtmlPlugin) {
-                        return res.end(indexHtmlPlugin.transform(item.handler().toString(), "index.html"));
+                        return res.end(indexHtmlPlugin.transform(item.handler().toString(), {
+                            filePath: "./index.html",
+                            requestUrl: "./index.html"
+                        }));
                     }
                     return res.end(item?.handler());
                 }
-                const transformValue = transform(req, plugins.getPlugins);
-                res.setHeader("content-Type", "text/javascript");
-                res.end(transformValue || "");
-            });
-            http.listen("3050");
+                transform(req, plugins.getPlugins, viteInstance).then(transformValue => {
+                    res.setHeader("content-Type", "text/javascript");
+                    res.end(transformValue || "");
+                });
+            }).listen("3050");
         }
     };
 };
 const runHttp = () => {
-    const router = Router();
-    const plugin = plugins();
     const http_ = {
-        router,
-        plugin,
+        router: Router(),
+        plugin: plugins(),
+        depend: depends(),
+        socket: null,
+        watch: null,
         http: null
     };
+    http_.watch = createWatchFile(handleWatchFile(http_));
+    http_.socket = createWss();
     http_.http = createHttp_(http_);
     return http_;
 };
@@ -141,5 +218,19 @@ h.plugin.addPlugins({
         }
         `;
     }
+});
+h.plugin.addPlugins({
+    exits: [".js", ".ts", ".tsx"],
+    async transform(v, file, i) {
+        await es_module_lexer_1.init;
+        const [imports] = (0, es_module_lexer_1.parse)(v);
+        imports.forEach(v => i.depend.addDepend(file.filePath, v.n));
+        return v;
+    }
+});
+h.plugin.addPlugins({
+    name: "addWatchFile",
+    enforce: "post",
+    handle: (v, file, i) => i.watch.add(file.filePath)
 });
 h.http.start();
