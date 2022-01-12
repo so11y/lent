@@ -7,7 +7,12 @@ export const isJsFlieRequest = (s: Http.IncomingMessage) => {
 }
 
 export const isHaveFile = (requireName: string) => {
-    const filePath = path.join(process.cwd(), requireName);
+    let fileRoot = process.cwd();
+    if (requireName.includes("client")) {
+        fileRoot = __dirname
+    }
+
+    const filePath = path.join(fileRoot, requireName);
     if (fs.existsSync(filePath)) {
         return filePath;
     }

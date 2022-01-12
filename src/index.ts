@@ -37,7 +37,6 @@ const depends = (): viteHttpInstance["depend"] => {
 
 const createWatchFile = (handleFile: ReturnType<HandleFileSystem>) => {
     const watcher = chokidar.watch([], {
-        ignored: ["**/node_modules/**", "**/.git/**"],
         persistent: true
     }).on("change", handleFile.change)
     return watcher

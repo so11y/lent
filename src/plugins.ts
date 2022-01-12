@@ -48,7 +48,7 @@ export default (h: viteHttpInstance) => {
         name: "indexHtml",
         transform(v) {
             const $ = cheerio.load(v);
-            $("head").append("<script type='module' src='./dist/client' />")
+            $("head").append(`<script type='module' src='./client' />`)
             return $.html();
         }
     })
