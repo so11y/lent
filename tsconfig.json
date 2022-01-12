@@ -3,13 +3,14 @@
         "target": "esnext",
         "module": "None",
         "baseUrl": ".",
-        "outDir": "./src",
+        "outDir": "./dist",
         "esModuleInterop": true,
         "declaration": true,
         "moduleResolution": "node",
     },
     "include": [
-        "index.ts",
+        "./src/index.ts",
+        "./src/client.ts"
     ],
     "exclude": [
         "node_modules",

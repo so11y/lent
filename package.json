@@ -10,7 +10,7 @@
   },
   "scripts": {
     "tsc": "tsc --watch",
-    "dev": "nodemon ./src/index.js"
+    "dev": "nodemon ./dist/index.js"
   },
   "name": "so11y",
   "version": "1.0.0",

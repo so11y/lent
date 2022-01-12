@@ -1,63 +1,12 @@
 
 import Http from "http";
 import fs from "fs";
-import path from "path";
-import ts from "typescript";
-import cheerio from "cheerio";
-import { parse, init } from "es-module-lexer";
 import { WebSocketServer, WebSocket } from 'ws'
 import { Socket } from 'net'
 import chokidar from "chokidar";
-
-interface Router {
-    method: string;
-    path: string;
-    handler: () => string | Buffer;
-}
-interface TransformPlugin {
-    exit?: string;
-    exits?: Array<string>;
-    name?: string;
-    enforce?: "post" | "pre";
-    handle?: (fileData: string, fileUrl: {
-        requestUrl: string,
-        filePath: string
-    }, viteHttpInstance?: viteHttpInstance) => void;
-    transform?: (fileData: string, fileUrl: {
-        requestUrl: string,
-        filePath: string
-    }, viteHttpInstance?: viteHttpInstance) => string | Promise<string>;
-}
-
-interface viteHttpInstance {
-    router: {
-        addRouter(router: Router): void;
-        getRouters(): Router[];
-    },
-    plugin: {
-        addPlugins(p: TransformPlugin): void;
-        getPlugins(): TransformPlugin[];
-    },
-    http: {
-        http(): void;
-        start(): void;
-    },
-    depend: {
-        getGraph: () => Map<string, Set<string>>;
-        getDepend: (fileName: string) => Set<string>;
-        addDepend(fileName: string, childFileName: string): void;
-    },
-    socket: {
-        webSocket: WebSocketServer;
-        sendSocket: (v: object) => void;
-    },
-    watch: chokidar.FSWatcher
-}
-interface HandleFileSystem {
-    (v: viteHttpInstance): {
-        change: (filePath: string, stats: fs.Stats) => void
-    }
-}
+import { findFile } from "./share";
+import allPlugins, { plugins } from "./plugins"
+import { HandleFileSystem, TransformPlugin, viteHttpInstance, Router } from "./types";
 
 const Router = (): viteHttpInstance["router"] => {
     const routers = new Set<Router>();
@@ -67,18 +16,6 @@ const Router = (): viteHttpInstance["router"] => {
         },
         getRouters() {
             return [...routers];
-        }
-    }
-}
-
-const plugins = (): viteHttpInstance["plugin"] => {
-    const plugins: Array<TransformPlugin> = []
-    return {
-        addPlugins(p: TransformPlugin) {
-            plugins.push(p);
-        },
-        getPlugins() {
-            return plugins;
         }
     }
 }
@@ -97,6 +34,7 @@ const depends = (): viteHttpInstance["depend"] => {
         }
     }
 }
+
 const createWatchFile = (handleFile: ReturnType<HandleFileSystem>) => {
     const watcher = chokidar.watch([], {
         ignored: ["**/node_modules/**", "**/.git/**"],
@@ -104,6 +42,7 @@ const createWatchFile = (handleFile: ReturnType<HandleFileSystem>) => {
     }).on("change", handleFile.change)
     return watcher
 }
+
 const handleWatchFile: HandleFileSystem = (i: viteHttpInstance) => {
     return {
         change(file, state) {
@@ -123,34 +62,12 @@ const createWss = () => {
     webSocket.on('connection', (socket) => {
         socket_ = socket;
         socket.send(JSON.stringify({ type: 'connected' }))
-        socket.on("message", (msg) => {
-            console.log(msg, "msg");
-        })
+        // socket.on("message", (msg) => {})
     })
     return {
         webSocket,
         sendSocket
     };
-}
-
-const isHaveFile = (requireName: string) => {
-    const filePath = path.join(process.cwd(), requireName);
-    if (fs.existsSync(filePath)) {
-        return filePath;
-    }
-    return false;
-}
-
-const findFile = (requireName: string, fileExit: Array<string>) => {
-    const f = isHaveFile(requireName);
-    if (f) return f;
-    for (const exitName of fileExit) {
-        const f = isHaveFile(requireName + exitName);
-        if (f) {
-            return f;
-        }
-    }
-    return "";
 }
 
 const transform = (req: Http.IncomingMessage, plugins: () => Array<TransformPlugin>, viteHttpInstance: viteHttpInstance) => {
@@ -180,7 +97,6 @@ const createHttp_ = (viteInstance: viteHttpInstance): viteHttpInstance["http"] =
         http: () => (http),
         start() {
             http.on("upgrade", (req, socket, head) => {
-                console.log("--upgrade--");
                 viteInstance.socket.webSocket.handleUpgrade(req, socket as Socket, head, (ws) => {
                     viteInstance.socket.webSocket.emit('connection', ws, req)
                 })
@@ -202,7 +118,10 @@ const createHttp_ = (viteInstance: viteHttpInstance): viteHttpInstance["http"] =
                     res.setHeader("content-Type", "text/javascript")
                     res.end(transformValue || "");
                 });
-            }).listen("3050")
+            }).listen("3050", () => {
+                console.log("lent v1.0.0 dev server running at:");
+                console.log("> Local: http://localhost:3050/");
+            })
 
         }
     }
@@ -220,80 +139,10 @@ const runHttp = (): viteHttpInstance => {
     http_.watch = createWatchFile(handleWatchFile(http_))
     http_.socket = createWss();
     http_.http = createHttp_(http_);
+    allPlugins(http_);
     return http_;
+
 }
 
-const h = runHttp()
 
-h.router.addRouter({
-    method: "GET",
-    path: "/",
-    handler() {
-        return fs.readFileSync("./index.html");
-    }
-})
-
-h.plugin.addPlugins({
-    exit: ".js",
-    transform: v => (v)
-})
-
-h.plugin.addPlugins({
-    exit: ".ts",
-    transform: (v) => {
-        return ts.transpileModule(v.toString(), {
-            compilerOptions: {
-                target: ts.ScriptTarget.ESNext,
-                module: ts.ModuleKind.ESNext,
-                // inlineSourceMap: true
-            }
-        }).outputText;
-    }
-})
-
-h.plugin.addPlugins({
-    name: "indexHtml",
-    transform(v) {
-        const $ = cheerio.load(v);
-        $("head").append("<script type='module' src='./client' />")
-        return $.html();
-    }
-})
-
-h.plugin.addPlugins({
-    exit: ".css",
-    transform: (v, fileName) => {
-        return `
-        const styles =  [...document.querySelectorAll("style")];
-        const style = styles.find(v=>v.title === '${fileName}');
-
-        if(style){
-            style.innerHTML = '${v.toString().replace(/\n|\r/g, "")}';
-        }else{
-            const style = document.createElement('style');
-            style.setAttribute('type', 'text/css');
-            style.title = '${fileName}';
-            style.innerHTML = '${v.toString().replace(/\n|\r/g, "")}';
-            document.head.appendChild(style);
-        }
-        `
-    }
-})
-
-h.plugin.addPlugins({
-    exits: [".js", ".ts", ".tsx"],
-    async transform(v, file, i) {
-        await init;
-        const [imports] = parse(v);
-        imports.forEach(v => i.depend.addDepend(file.filePath, v.n))
-        return v;
-    }
-})
-
-h.plugin.addPlugins({
-    name: "addWatchFile",
-    enforce: "post",
-    handle: (v, file, i) => i.watch.add(file.filePath)
-})
-
-h.http.start();
+runHttp().http.start()

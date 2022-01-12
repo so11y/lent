@@ -1,5 +1,5 @@
 
-const dataMap = new Map();
+const dataMap = new Map<string,any>();
 
 const createSocket = () => {
     console.log('[lent] connecting...');
@@ -12,7 +12,6 @@ const createSocket = () => {
             const data = JSON.parse(msg.data);
             if (data.hot) {
                 if(dataMap.has(data.fileName)){
-
                 }else{
                     window.location.reload();
                 }
