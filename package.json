@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "@types/node": "^17.0.8",
+    "cheerio": "^1.0.0-rc.10",
+    "typescript": "^4.5.4"
+  },
+  "scripts": {
+    "tsc": "tsc --watch",
+    "dev": "nodemon ./src/index.js"
+  },
+  "name": "so11y",
+  "version": "1.0.0",
+  "description": "Lent",
+  "main": "main.js",
+  "dependencies": {},
+  "author": "",
+  "license": "ISC"
+}
