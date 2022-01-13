@@ -23,6 +23,9 @@ export interface TransformPlugin {
 }
 
 export interface viteHttpInstance {
+    performance: {
+        startTime: number
+    },
     router: {
         addRouter(router: Router): void;
         getRouters(): Router[];

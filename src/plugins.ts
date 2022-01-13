@@ -20,13 +20,14 @@ export const plugins = (): viteHttpInstance["plugin"] => {
 
 export const beforeCreate = (h: viteHttpInstance) => {
 
-    h.watch.add(path.join(h.config.root, "./index.html"))
-
     h.router.addRouter({
         method: "GET",
         path: "/",
         handler() {
-            return fs.readFileSync(path.join(h.config.root, "./index.html"));
+            const indexPath = path.join(h.config.root, "./index.html");
+            h.watch.add(indexPath)
+            h.depend.addDepend(indexPath,"");
+            return fs.readFileSync(indexPath);
         }
     })
 

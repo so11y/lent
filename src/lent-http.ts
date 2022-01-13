@@ -30,8 +30,8 @@ export const createHttp = (viteInstance: viteHttpInstance): viteHttpInstance["ht
                     const indexHtmlPlugin = plugins.getPlugins().find(v => v.name === "indexHtml");
                     if (indexHtmlPlugin) {
                         return res.end(indexHtmlPlugin.transform(item!.handler().toString(), {
-                            filePath: "./index.html",
-                            requestUrl: "./index.html"
+                            filePath: "index.html",
+                            requestUrl: "index.html"
                         }));
                     }
                     return res.end(item?.handler())
@@ -43,6 +43,7 @@ export const createHttp = (viteInstance: viteHttpInstance): viteHttpInstance["ht
             }).listen(viteInstance.config.port, () => {
                 console.log("lent v1.0.0 dev server running at:");
                 console.log(`> Local: http://localhost:${viteInstance.config.port}/`);
+                console.log(`> running time ${Date.now() - viteInstance.performance.startTime}ms`);
             })
 
         }

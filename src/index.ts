@@ -10,6 +10,9 @@ import { plugins, beforeCreate } from "./plugins"
 
 const lent = (): viteHttpInstance => {
     const lentInstance_ = {
+        performance: {
+            startTime: Date.now()
+        },
         router: router(),
         plugin: plugins(),
         depend: depends(),
