@@ -1,8 +1,6 @@
 import chokidar from "chokidar";
 import { viteHttpInstance, FileCallback } from "./types";
 
-
-
 export const createWatchFile = (l: viteHttpInstance) => {
     const watcher = chokidar.watch([], {
         persistent: true
@@ -22,7 +20,6 @@ export const handleWatchFileEvent = () => {
                     fileWatchEvent.get(eventName).push(fileCallback)
                 }
             }
-            console.log(fileWatchEvent.get(eventName), eventName);
         },
         emit(eventName: string, path: string) {
             const event = fileWatchEvent.get(eventName);

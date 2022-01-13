@@ -21,6 +21,7 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
             i.watchFileEvent.on("change", {
                 filePath: file.filePath,
                 callback: () => {
+                    console.log(`[lent] update file ${file.requestUrl}`);
                     setFileEtag(file.requestUrl, true)
                 }
             })
