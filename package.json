@@ -20,9 +20,9 @@
         "dist/*.d.ts"
     ],
     "name": "lent",
-    "version": "1.0.6",
-    "description": "Lent",
-    "main": "main.js",
+    "version": "1.0.7",
+    "description": "lent",
+    "main": "dist/index.js",
     "author": "",
     "license": "ISC"
 }
