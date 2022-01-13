@@ -28,7 +28,7 @@ export interface FileCallback {
     callback: () => void
 }
 export interface HandleWatchFileEvent {
-    on(eventName: string, FileCallback): void;
+    on(eventName: string, fileCallback:FileCallback): void;
     emit(eventName: string, path: string): void;
 }
 
