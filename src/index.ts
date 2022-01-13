@@ -7,7 +7,7 @@ import { createWss } from "./wss";
 import allPlugins, { plugins } from "./plugins"
 
 const lent = (): viteHttpInstance => {
-    const http_ = {
+    const lentInstance_ = {
         router: router(),
         plugin: plugins(),
         depend: depends(),
@@ -15,11 +15,11 @@ const lent = (): viteHttpInstance => {
         watch: null,
         http: null as viteHttpInstance["http"]
     }
-    http_.watch = createWatchFile(handleWatchFile(http_))
-    http_.socket = createWss();
-    http_.http = createHttp(http_);
-    allPlugins(http_);
-    return http_;
+    lentInstance_.watch = createWatchFile(handleWatchFile(lentInstance_))
+    lentInstance_.socket = createWss();
+    lentInstance_.http = createHttp(lentInstance_);
+    allPlugins(lentInstance_);
+    return lentInstance_;
 }
 
 
