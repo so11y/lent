@@ -7,7 +7,6 @@ export const indexHtmlAddClientPlugin: LentPlugin = (l) => {
         transform(v) {
             const $ = cheerio.load(v);
             $("head").append(`<script type='module' src='./client' />`)
-            //需要加etag
             return $.html();
         }
     })
