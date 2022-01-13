@@ -3,6 +3,7 @@ import cheerio from "cheerio";
 import { parse, init } from "es-module-lexer";
 import { TransformPlugin, viteHttpInstance } from "./types";
 import fs from "fs";
+import path from "path";
 
 export const plugins = (): viteHttpInstance["plugin"] => {
     const plugins: Array<TransformPlugin> = []
@@ -17,12 +18,15 @@ export const plugins = (): viteHttpInstance["plugin"] => {
 }
 
 
-export default (h: viteHttpInstance) => {
+export const beforeCreate = (h: viteHttpInstance) => {
+
+    h.watch.add(path.join(h.config.root, "./index.html"))
+
     h.router.addRouter({
         method: "GET",
         path: "/",
         handler() {
-            return fs.readFileSync("./index.html");
+            return fs.readFileSync(path.join(h.config.root, "./index.html"));
         }
     })
 
@@ -87,5 +91,16 @@ export default (h: viteHttpInstance) => {
         name: "addWatchFile",
         enforce: "post",
         handle: (v, file, i) => i.watch.add(file.filePath)
+    })
+
+    h.plugin.addPlugins({
+        exit: ".js",
+        name: "replaceClientSocketUrl",
+        transform(fileData, fileUrl, v) {
+            if (fileUrl.requestUrl.includes("client")) {
+                return fileData.replace("replace_socket_url", v.config.port.toString())
+            }
+            return fileData;
+        }
     })
 }

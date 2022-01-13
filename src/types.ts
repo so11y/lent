@@ -44,7 +44,12 @@ export interface viteHttpInstance {
         webSocket: WebSocketServer;
         sendSocket: (v: object) => void;
     },
-    watch: chokidar.FSWatcher
+    watch: chokidar.FSWatcher,
+    config: {
+        root?: string,
+        port?: number,
+        plugin?: (v: viteHttpInstance) => void
+    }
 }
 export interface HandleFileSystem {
     (v: viteHttpInstance): {

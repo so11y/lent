@@ -3,13 +3,9 @@ import fs from "fs";
 import { viteHttpInstance, TransformPlugin } from "./types";
 import type Http from "http";
 
-
-export const isHaveFile = (requireName: string) => {
-    let fileRoot = process.cwd();
-    if (requireName.includes("client")) {
-        fileRoot = __dirname
-    }
-
+export const isHaveFile = (requireName: string, viteHttpInstance: viteHttpInstance) => {
+    let fileRoot = viteHttpInstance.config.root;
+    if (requireName.includes("client")) fileRoot = __dirname
     const filePath = path.join(fileRoot, requireName);
     if (fs.existsSync(filePath)) {
         return filePath;
@@ -17,11 +13,11 @@ export const isHaveFile = (requireName: string) => {
     return false;
 }
 
-export const findFile = (requireName: string, fileExit: Array<string>) => {
-    const f = isHaveFile(requireName);
+export const findFile = (requireName: string, fileExit: Array<string>, viteHttpInstance: viteHttpInstance) => {
+    const f = isHaveFile(requireName, viteHttpInstance);
     if (f) return f;
     for (const exitName of fileExit) {
-        const f = isHaveFile(requireName + exitName);
+        const f = isHaveFile(requireName + exitName, viteHttpInstance);
         if (f) {
             return f;
         }
@@ -31,7 +27,7 @@ export const findFile = (requireName: string, fileExit: Array<string>) => {
 
 export const transform = (req: Http.IncomingMessage, plugins: () => Array<TransformPlugin>, viteHttpInstance: viteHttpInstance) => {
     let fileData = "";
-    const filePath = findFile(req.url, ['.js', '.ts', '.tsx', '.css'])
+    const filePath = findFile(req.url, ['.js', '.ts', '.tsx', '.css'], viteHttpInstance)
     const filterplugins = plugins().filter(v => {
         if (req.url.endsWith(v.exit) || filePath.endsWith(v.exit)) {
             return true;

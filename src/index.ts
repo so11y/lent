@@ -4,21 +4,25 @@ import { viteHttpInstance } from "./types";
 import { createWatchFile, handleWatchFile } from "./watchFile";
 import { depends } from "./depends";
 import { createWss } from "./wss";
-import allPlugins, { plugins } from "./plugins"
+import { getConfig } from "./getConfig"
+import { plugins, beforeCreate } from "./plugins"
+
 
 const lent = (): viteHttpInstance => {
     const lentInstance_ = {
         router: router(),
         plugin: plugins(),
         depend: depends(),
-        socket: null as viteHttpInstance["socket"],
+        config: null,
+        socket: null,
         watch: null,
-        http: null as viteHttpInstance["http"]
+        http: null,
     }
     lentInstance_.watch = createWatchFile(handleWatchFile(lentInstance_))
     lentInstance_.socket = createWss();
     lentInstance_.http = createHttp(lentInstance_);
-    allPlugins(lentInstance_);
+    lentInstance_.config = getConfig(lentInstance_);
+    beforeCreate(lentInstance_);
     return lentInstance_;
 }
 

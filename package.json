@@ -17,10 +17,6 @@
         "dist/*.js",
         "dist/*.d.ts"
     ],
-    "scripts": {
-        "tsc": "tsc --watch",
-        "dev": "nodemon ./dist/index.js"
-    },
     "name": "lent",
     "version": "1.0.6",
     "description": "Lent",

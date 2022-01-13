@@ -3,7 +3,7 @@ const dataMap = new Map<string,any>();
 
 const createSocket = () => {
     console.log('[lent] connecting...');
-    const ws = new WebSocket('ws://localhost:3050')
+    const ws = new WebSocket('ws://localhost:replace_socket_url')
     ws.addEventListener("open", () => {
         console.log('[lent] connected');
     })

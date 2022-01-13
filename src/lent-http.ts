@@ -40,9 +40,9 @@ export const createHttp = (viteInstance: viteHttpInstance): viteHttpInstance["ht
                     res.setHeader("content-Type", "text/javascript")
                     res.end(transformValue || "");
                 });
-            }).listen("3050", () => {
+            }).listen(viteInstance.config.port, () => {
                 console.log("lent v1.0.0 dev server running at:");
-                console.log("> Local: http://localhost:3050/");
+                console.log(`> Local: http://localhost:${viteInstance.config.port}/`);
             })
 
         }
