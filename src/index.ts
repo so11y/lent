@@ -5,8 +5,7 @@ import { createWatchFile, handleWatchFile } from "./watchFile";
 import { depends } from "./depends";
 import { createWss } from "./wss";
 import { getConfig } from "./getConfig"
-import { plugins, beforeCreate } from "./plugins"
-
+import { plugins, applyComposePlugin } from "./plugins/preCompose"
 
 const lent = (): viteHttpInstance => {
     const lentInstance_ = {
@@ -25,7 +24,7 @@ const lent = (): viteHttpInstance => {
     lentInstance_.socket = createWss();
     lentInstance_.http = createHttp(lentInstance_);
     lentInstance_.config = getConfig(lentInstance_);
-    beforeCreate(lentInstance_);
+    applyComposePlugin(lentInstance_)
     return lentInstance_;
 }
 

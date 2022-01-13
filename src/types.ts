@@ -1,6 +1,7 @@
 import type chokidar from "chokidar";
 import type { WebSocketServer } from 'ws'
 import type fs from "fs";
+import { LentModuleDepends } from "./depends";
 
 export interface Router {
     method: string;
@@ -18,7 +19,7 @@ export interface TransformPlugin {
     }, viteHttpInstance?: viteHttpInstance) => void;
     transform?: (fileData: string, fileUrl: {
         requestUrl: string,
-        filePath: string
+        filePath: string,
     }, viteHttpInstance?: viteHttpInstance) => string | Promise<string>;
 }
 
@@ -39,9 +40,9 @@ export interface viteHttpInstance {
         start(): void;
     },
     depend: {
-        getGraph: () => Map<string, Set<string>>;
-        getDepend: (fileName: string) => Set<string>;
-        addDepend(fileName: string, childFileName: string): void;
+        getGraph: () => Map<string, LentModuleDepends>;
+        getDepend: (fileName: string) => LentModuleDepends;
+        addDepend(fileName: string, lentModule: LentModuleDepends): void;
     },
     socket: {
         webSocket: WebSocketServer;

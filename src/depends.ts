@@ -1,16 +1,27 @@
+import { ImportSpecifier } from "es-module-lexer";
 import { viteHttpInstance } from "./types";
 
+export interface LentModuleDepends {
+    importFile: Array<ImportSpecifier>;
+    etag?: string;
+    requestUrl?: string;
+}
+
+export const createLentModuleDepend = <T extends LentModuleDepends>(m: T): T => {
+    return {
+        etag: "",
+        requestUrl:"",
+        ...m
+    };
+}
+
 export const depends = (): viteHttpInstance["depend"] => {
-    const dependGraph = new Map<string, Set<string>>();
+    const dependGraph = new Map<string, LentModuleDepends>();
     return {
         getGraph: () => dependGraph,
         getDepend: (fileName: string) => (dependGraph.get(fileName)),
-        addDepend(fileName: string, childFileName: string) {
-            if (dependGraph.has(fileName)) {
-                dependGraph.get(fileName).add(childFileName)
-            } else {
-                dependGraph.set(fileName, new Set([childFileName]))
-            }
+        addDepend(fileName: string, lentModule: LentModuleDepends) {
+            dependGraph.set(fileName, lentModule)
         }
     }
 }
