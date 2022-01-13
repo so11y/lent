@@ -43,7 +43,7 @@ export const beforeCreate = (h: viteHttpInstance) => {
                 compilerOptions: {
                     target: ts.ScriptTarget.ESNext,
                     module: ts.ModuleKind.ESNext,
-                    inlineSourceMap: true
+                    // inlineSourceMap: true
                 }
             }).outputText;
         }
