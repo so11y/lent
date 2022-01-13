@@ -1,17 +1,36 @@
 import chokidar from "chokidar";
-import { HandleFileSystem, viteHttpInstance } from "./types";
+import { viteHttpInstance, FileCallback } from "./types";
 
-export const createWatchFile = (handleFile: ReturnType<HandleFileSystem>) => {
+
+
+export const createWatchFile = (l: viteHttpInstance) => {
     const watcher = chokidar.watch([], {
         persistent: true
-    }).on("change", handleFile.change)
+    }).on("change", (path) => l.watchFileEvent.emit("change", path))
     return watcher
 }
 
-export const handleWatchFile: HandleFileSystem = (i: viteHttpInstance) => {
+export const handleWatchFileEvent = () => {
+    const fileWatchEvent = new Map<string, Array<FileCallback>>()
     return {
-        change(file, state) {
-            i.socket.sendSocket({ fileName: file, hot: true });
+        on(eventName: string, fileCallback: FileCallback) {
+            if (!fileWatchEvent.has(eventName)) {
+                fileWatchEvent.set(eventName, [fileCallback])
+            } else {
+                const fileRegister = fileWatchEvent.get(eventName);
+                if (!fileRegister.some(v => v.filePath === fileCallback.filePath)) {
+                    fileWatchEvent.get(eventName).push(fileCallback)
+                }
+            }
+            console.log(fileWatchEvent.get(eventName), eventName);
+        },
+        emit(eventName: string, path: string) {
+            const event = fileWatchEvent.get(eventName);
+            if (event) {
+                event.forEach(v => {
+                    if (v.filePath === path) v.callback()
+                });
+            }
         }
     }
 }

@@ -25,16 +25,15 @@ export const createHttp = (viteInstance: viteHttpInstance): viteHttpInstance["ht
                 })
             })
             http.on("request", (req, res) => {
+                const etag = viteInstance.depend.getDepend(req.url)?.etag
 
-                if (req.headers["if-none-match"] === viteInstance.depend.getDepend(req.url)?.etag) {
+                if (etag && req.headers["if-none-match"] === etag) {
                     res.statusCode = 304
                     return res.end();
                 }
 
                 const item = viteInstance.router.getRouters().find((v) => v.path === req.url);
-
                 const plugins = viteInstance.plugin;
-
                 if (item) {
                     const indexHtmlPlugin = plugins.getPlugins().find(v => v.name === "indexHtmlAddClientPlugin");
                     if (indexHtmlPlugin) {

@@ -23,6 +23,15 @@ export interface TransformPlugin {
     }, viteHttpInstance?: viteHttpInstance) => string | Promise<string>;
 }
 
+export interface FileCallback {
+    filePath: string,
+    callback: () => void
+}
+export interface HandleWatchFileEvent {
+    on(eventName: string, FileCallback): void;
+    emit(eventName: string, path: string): void;
+}
+
 export interface viteHttpInstance {
     performance: {
         startTime: number
@@ -49,14 +58,10 @@ export interface viteHttpInstance {
         sendSocket: (v: object) => void;
     },
     watch: chokidar.FSWatcher,
+    watchFileEvent: HandleWatchFileEvent,
     config: {
         root?: string,
         port?: number,
         plugin?: (v: viteHttpInstance) => void
-    }
-}
-export interface HandleFileSystem {
-    (v: viteHttpInstance): {
-        change: (filePath: string, stats: fs.Stats) => void
     }
 }

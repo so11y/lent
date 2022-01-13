@@ -1,14 +1,16 @@
 import { TransformPlugin, viteHttpInstance } from "../types";
 import { indexRouterPlugin } from "./indexRouterPlugin";
 import { handleCssPlugin } from "./handleCssPlugin";
-import { indexHtmlAddClientPlugin } from "./indexHtmlAddClient";
+import { indexHtmlAddClientPlugin } from "./indexHtmlAddClientPlugin";
 import { handleJsPlugin } from "./handleJsPlugin";
 import { handleTsPlugin } from "./handleTsPlugin";
 import { handleFileImportPlugin } from "./handleFileImportPlugin";
 import { handleFileWatchPlugin } from "./handleFileWatchPlugin";
 import { handleSocketPortPlugin } from "./handleSocketPortPlugin";
+import { handleCreateLentFileModule } from "./handleCreateLentFileModule"
 
 export type LentPlugin = (l: viteHttpInstance) => void;
+
 
 export const plugins = (): viteHttpInstance["plugin"] => {
     const plugins: Array<TransformPlugin> = []
@@ -24,14 +26,15 @@ export const plugins = (): viteHttpInstance["plugin"] => {
 
 export const preCompose = (): Array<LentPlugin> => {
     return [
-        indexRouterPlugin(),
-        indexHtmlAddClientPlugin(),
-        handleJsPlugin(),
-        handleCssPlugin(),
-        handleTsPlugin(),
-        handleFileImportPlugin(),
-        handleSocketPortPlugin(),
-        handleFileWatchPlugin()
+        indexRouterPlugin,
+        indexHtmlAddClientPlugin,
+        handleJsPlugin,
+        handleCssPlugin,
+        handleTsPlugin,
+        handleFileImportPlugin,
+        handleSocketPortPlugin,
+        handleCreateLentFileModule,
+        handleFileWatchPlugin
     ]
 }
 

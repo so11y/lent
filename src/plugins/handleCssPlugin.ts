@@ -1,12 +1,11 @@
 import { LentPlugin } from "./preCompose"
 
-export const handleCssPlugin = ():LentPlugin => {
-    return (l) => {
-        l.plugin.addPlugins({
-            exit: ".css",
-            name:"handleCssPlugin",
-            transform: (v, fileName) => {
-                return `
+export const handleCssPlugin: LentPlugin = (l) => {
+    l.plugin.addPlugins({
+        exit: ".css",
+        name: "handleCssPlugin",
+        transform: (v, fileName) => {
+            return `
                 const styles =  [...document.querySelectorAll("style")];
                 const style = styles.find(v=>v.title === '${fileName}');
                 if(style){
@@ -19,7 +18,6 @@ export const handleCssPlugin = ():LentPlugin => {
                     document.head.appendChild(style);
                 }
                 `
-            }
-        })
-    }
+        }
+    })
 }
