@@ -23,7 +23,13 @@ export const indexRouterPlugin: LentPlugin = (l) => {
 					requestUrl: indexPath
 				},
 				() => {
-					l.socket.sendSocket({ fileName: indexPath, hot: true });
+					l.socket.sendSocket({
+						hotModule: {
+							fileName: indexPath,
+							parent: null
+						},
+						hot: true
+					});
 				}
 			);
 			return fs.readFileSync(indexPath);

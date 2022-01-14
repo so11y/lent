@@ -1,6 +1,7 @@
 import Http from 'http';
 import { Socket } from 'net';
 import { transform } from './handleFile';
+import { handleUrl } from './share';
 import { LentHttpInstance, Router as TypeRouter } from './types';
 
 export const router = (): LentHttpInstance['router'] => {
@@ -14,6 +15,7 @@ export const router = (): LentHttpInstance['router'] => {
 		}
 	};
 };
+
 export const createHttp = (
 	lentInstance: LentHttpInstance
 ): LentHttpInstance['http'] => {
@@ -33,7 +35,9 @@ export const createHttp = (
 			});
 			http
 				.on('request', (req, res) => {
-					const etag = lentInstance.depend.getDepend(req.url)?.etag;
+					const [requestFileName, isHot] = handleUrl(req.url);
+
+					const etag = lentInstance.depend.getDepend(requestFileName)?.etag;
 
 					if (etag && req.headers['if-none-match'] === etag) {
 						res.statusCode = 304;
@@ -42,7 +46,8 @@ export const createHttp = (
 
 					const item = lentInstance.router
 						.getRouters()
-						.find((v) => v.path === req.url);
+						.find((v) => v.path === requestFileName);
+
 					const plugins = lentInstance.plugin;
 					if (item) {
 						const indexHtmlPlugin = plugins
@@ -52,17 +57,17 @@ export const createHttp = (
 							return res.end(
 								indexHtmlPlugin.transform(item!.handler().toString(), {
 									filePath: 'index.html',
-									requestUrl: req.url
+									requestUrl: requestFileName
 								})
 							);
 						}
 						return res.end(item?.handler());
 					}
 
-					transform(req, plugins.getPlugins, lentInstance).then(
+					transform(requestFileName, plugins.getPlugins, lentInstance).then(
 						(transformValue) => {
 							const fileValue = transformValue || '';
-							const etag = lentInstance.depend.getDepend(req.url)?.etag;
+							const etag = lentInstance.depend.getDepend(requestFileName)?.etag;
 							res.setHeader('content-Type', 'text/javascript');
 							if (etag) {
 								res.setHeader('Etag', etag);

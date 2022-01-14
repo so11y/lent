@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'fs';
 import { LentHttpInstance, TransformPlugin } from './types';
-import type Http from 'http';
 
 export const isHaveFile = (
 	requireName: string,
@@ -33,21 +32,24 @@ export const findFile = (
 };
 
 export const transform = (
-	req: Http.IncomingMessage,
+	requestFileName: string,
 	plugins: () => Array<TransformPlugin>,
 	lentHttpInstance: LentHttpInstance
 ) => {
 	let fileData = '';
 	const filePath = findFile(
-		req.url,
-		['.js', '.ts', '.tsx', '.css'],
+		requestFileName,
+		['.js', '.ts', '.css'],
 		lentHttpInstance
 	);
+
 	const filterplugins = plugins().filter((v) => {
-		if (req.url.endsWith(v.exit) || filePath.endsWith(v.exit)) {
+		if (requestFileName.endsWith(v.exit) || filePath.endsWith(v.exit)) {
 			return true;
 		} else if (
-			v.exits?.some((vv) => req.url.includes(vv) || filePath.endsWith(vv))
+			v.exits?.some(
+				(vv) => requestFileName.includes(vv) || filePath.endsWith(vv)
+			)
 		) {
 			return true;
 		}
@@ -57,8 +59,8 @@ export const transform = (
 	}
 	if (filterplugins.length) {
 		const fileUrl = {
-			filePath: filePath || req.url,
-			requestUrl: req.url
+			filePath: filePath || requestFileName,
+			requestUrl: requestFileName
 		};
 		plugins()
 			.filter((v) => v.enforce === 'post')

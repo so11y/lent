@@ -1,11 +1,20 @@
+import { getdependsParent } from 'src/depends';
 import { addFileChange } from '../watchFile';
 import { LentPlugin } from './preCompose';
 
 export const handleFileWatchPlugin: LentPlugin = (l) => {
 	const setFileEtag = (requestUrl: string, isSend: boolean) => {
-		l.depend.getDepend(requestUrl).etag = Date.now().toString();
+		const dependModule = l.depend.getDepend(requestUrl);
+		dependModule.etag = Date.now().toString();
 		if (isSend) {
-			l.socket.sendSocket({ fileName: requestUrl, hot: true });
+			const moduleParent = getdependsParent(requestUrl, l.depend);
+			l.socket.sendSocket({
+				hotModule: {
+					fileName: requestUrl,
+					parent: moduleParent
+				},
+				hot: true
+			});
 		}
 	};
 	l.plugin.addPlugins({
