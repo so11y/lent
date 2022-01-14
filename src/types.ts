@@ -8,15 +8,18 @@ export interface Router {
     path: string;
     handler: () => string | Buffer;
 }
+export interface FileUrl {
+    requestUrl: string,
+    filePath: string
+}
+
+
 export interface TransformPlugin {
     exit?: string;
     exits?: Array<string>;
     name?: string;
     enforce?: "post" | "pre";
-    handle?: (fileData: string, fileUrl: {
-        requestUrl: string,
-        filePath: string
-    }, viteHttpInstance?: viteHttpInstance) => void;
+    handle?: (fileData: string, fileUrl: FileUrl, viteHttpInstance?: viteHttpInstance) => void;
     transform?: (fileData: string, fileUrl: {
         requestUrl: string,
         filePath: string,
@@ -28,7 +31,7 @@ export interface FileCallback {
     callback: () => void
 }
 export interface HandleWatchFileEvent {
-    on(eventName: string, fileCallback:FileCallback): void;
+    on(eventName: string, fileCallback: FileCallback): void;
     emit(eventName: string, path: string): void;
 }
 

@@ -1,6 +1,7 @@
 
 import fs from "fs";
 import path from "path";
+import { addFileChange } from "../watchFile";
 import { createLentModuleDepend } from "../depends";
 import { LentPlugin } from "./preCompose"
 
@@ -10,17 +11,15 @@ export const indexRouterPlugin: LentPlugin = (l) => {
         path: "/",
         handler() {
             const indexPath = path.join(l.config.root, "./index.html");
-            l.watch.add(indexPath)
-            l.watchFileEvent.on("change", {
-                filePath: indexPath,
-                callback: () => {
-                    console.log(`[lent] update file ${indexPath}`);
-                    l.socket.sendSocket({ fileName: indexPath, hot: true });
-                }
-            })
             l.depend.addDepend(indexPath, createLentModuleDepend({
                 importFile: []
             }));
+            addFileChange(l, {
+                filePath: indexPath,
+                requestUrl: indexPath
+            }, () => {
+                l.socket.sendSocket({ fileName: indexPath, hot: true });
+            })
             return fs.readFileSync(indexPath);
         }
     })
