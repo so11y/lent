@@ -36,7 +36,11 @@ export default [
             }),
             replaces(),
         ],
-        external: ['http','path','ws','chokidar','fs','cheerio','typescript','es-module-lexer'],
+        watch: {
+            include: 'src/**',
+            exclude: 'node_modules/**'
+        },
+        external: ['http', 'path', 'ws', 'chokidar', 'fs', 'cheerio', 'typescript', 'es-module-lexer'],
         output: {
             banner,
             file: './dist/index.js',
@@ -52,6 +56,10 @@ export default [
             }),
             replaces(),
         ],
+        watch: {
+            include: 'src/client.ts',
+            exclude: 'node_modules/**'
+        },
         output: {
             banner,
             file: './dist/client.js',
