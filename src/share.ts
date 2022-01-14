@@ -1,5 +1,5 @@
-import Http from "http";
+import Http from 'http';
 
 export const isJsFlieRequest = (s: Http.IncomingMessage) => {
-    return s.url.endsWith(".js")
-}
+	return s.url.endsWith('.js');
+};
