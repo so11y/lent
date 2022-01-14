@@ -1,5 +1,5 @@
-import type chokidar from 'chokidar';
-import type { WebSocketServer } from 'ws';
+import chokidar from 'chokidar';
+import { WebSocketServer } from 'ws';
 import { LentModuleDepends } from './depends';
 
 export interface Router {
