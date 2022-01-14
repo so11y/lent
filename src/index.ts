@@ -5,8 +5,9 @@ import { depends } from './depends';
 import { createWss } from './wss';
 import { getConfig } from './getConfig';
 import { plugins, applyComposePlugin } from './plugins/preCompose';
+export { defineLentConfig } from './defineLentConfig';
 
-const lent = (): LentHttpInstance => {
+export const lent = (): LentHttpInstance => {
 	const lentInstance_ = {
 		performance: {
 			startTime: Date.now()
@@ -27,5 +28,3 @@ const lent = (): LentHttpInstance => {
 	applyComposePlugin(lentInstance_);
 	return lentInstance_;
 };
-
-lent().http.start();

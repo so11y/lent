@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-require("../dist/index.js");
+const crateLent = require('../dist/index.js');
+
+crateLent.lent().http.start();
