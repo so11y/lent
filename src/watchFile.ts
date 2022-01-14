@@ -1,7 +1,7 @@
 import chokidar from "chokidar";
-import { viteHttpInstance, FileCallback, FileUrl } from "./types";
+import { LentHttpInstance, FileCallback, FileUrl } from "./types";
 
-export const createWatchFile = (l: viteHttpInstance) => {
+export const createWatchFile = (l: LentHttpInstance) => {
     const watcher = chokidar.watch([], {
         persistent: true
     }).on("change", (path) => l.watchFileEvent.emit("change", path))
@@ -32,7 +32,7 @@ export const handleWatchFileEvent = () => {
     }
 }
 
-export const addFileChange = (l: viteHttpInstance, fileUrl: FileUrl, callback: () => void) => {
+export const addFileChange = (l: LentHttpInstance, fileUrl: FileUrl, callback: () => void) => {
     l.watchFileEvent.on("change", {
         filePath: fileUrl.filePath,
         callback: () => {

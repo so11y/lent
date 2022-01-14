@@ -1,5 +1,5 @@
 import { ImportSpecifier } from "es-module-lexer";
-import { viteHttpInstance } from "./types";
+import { LentHttpInstance } from "./types";
 
 export interface LentModuleDepends {
     importFile: Array<ImportSpecifier>;
@@ -15,7 +15,7 @@ export const createLentModuleDepend = <T extends LentModuleDepends>(m: T): T => 
     };
 }
 
-export const depends = (): viteHttpInstance["depend"] => {
+export const depends = (): LentHttpInstance["depend"] => {
     const dependGraph = new Map<string, LentModuleDepends>();
     return {
         getGraph: () => dependGraph,

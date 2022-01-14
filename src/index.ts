@@ -1,13 +1,13 @@
 
 import { router, createHttp } from "./lent-http";
-import { viteHttpInstance } from "./types";
+import { LentHttpInstance } from "./types";
 import { createWatchFile, handleWatchFileEvent } from "./watchFile";
 import { depends } from "./depends";
 import { createWss } from "./wss";
 import { getConfig } from "./getConfig"
 import { plugins, applyComposePlugin } from "./plugins/preCompose"
 
-const lent = (): viteHttpInstance => {
+const lent = (): LentHttpInstance => {
     const lentInstance_ = {
         performance: {
             startTime: Date.now()

@@ -12,7 +12,7 @@ const banner = `/*!
 
 const replaces = () => {
     const replacesKey = {
-        __TEST__: false
+        __DEV__: false
     };
     Object.keys(replacesKey).forEach((key) => {
         if (key in process.env) {
@@ -40,7 +40,7 @@ export default [
             include: 'src/**',
             exclude: 'node_modules/**'
         },
-        external: ['http', 'path', 'ws', 'chokidar', 'fs', 'cheerio', 'typescript', 'es-module-lexer'],
+        external: Object.keys(pkg.dependencies),
         output: {
             banner,
             file: './dist/index.js',

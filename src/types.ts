@@ -1,6 +1,5 @@
 import type chokidar from "chokidar";
 import type { WebSocketServer } from 'ws'
-import type fs from "fs";
 import { LentModuleDepends } from "./depends";
 
 export interface Router {
@@ -12,18 +11,16 @@ export interface FileUrl {
     requestUrl: string,
     filePath: string
 }
-
-
 export interface TransformPlugin {
     exit?: string;
     exits?: Array<string>;
     name?: string;
     enforce?: "post" | "pre";
-    handle?: (fileData: string, fileUrl: FileUrl, viteHttpInstance?: viteHttpInstance) => void;
+    handle?: (fileData: string, fileUrl: FileUrl, lentHttpInstance?: LentHttpInstance) => void;
     transform?: (fileData: string, fileUrl: {
         requestUrl: string,
         filePath: string,
-    }, viteHttpInstance?: viteHttpInstance) => string | Promise<string>;
+    }, lentHttpInstance?: LentHttpInstance) => string | Promise<string>;
 }
 
 export interface FileCallback {
@@ -35,7 +32,7 @@ export interface HandleWatchFileEvent {
     emit(eventName: string, path: string): void;
 }
 
-export interface viteHttpInstance {
+export interface LentHttpInstance {
     performance: {
         startTime: number
     },
@@ -65,6 +62,6 @@ export interface viteHttpInstance {
     config: {
         root?: string,
         port?: number,
-        plugin?: (v: viteHttpInstance) => void
+        plugin?: (v: LentHttpInstance) => void
     }
 }

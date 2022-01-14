@@ -1,4 +1,4 @@
-import { TransformPlugin, viteHttpInstance } from "../types";
+import { TransformPlugin, LentHttpInstance } from "../types";
 import { indexRouterPlugin } from "./indexRouterPlugin";
 import { handleCssPlugin } from "./handleCssPlugin";
 import { indexHtmlAddClientPlugin } from "./indexHtmlAddClientPlugin";
@@ -9,10 +9,10 @@ import { handleFileWatchPlugin } from "./handleFileWatchPlugin";
 import { handleSocketPortPlugin } from "./handleSocketPortPlugin";
 import { handleCreateLentFileModule } from "./handleCreateLentFileModule"
 
-export type LentPlugin = (l: viteHttpInstance) => void;
+export type LentPlugin = (l: LentHttpInstance) => void;
 
 
-export const plugins = (): viteHttpInstance["plugin"] => {
+export const plugins = (): LentHttpInstance["plugin"] => {
     const plugins: Array<TransformPlugin> = []
     return {
         addPlugins(p: TransformPlugin) {
@@ -38,6 +38,6 @@ export const preCompose = (): Array<LentPlugin> => {
     ]
 }
 
-export const applyComposePlugin = (l: viteHttpInstance) => {
+export const applyComposePlugin = (l: LentHttpInstance) => {
     preCompose().forEach(p => p(l))
 }

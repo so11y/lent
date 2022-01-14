@@ -1,16 +1,16 @@
 import path from "path";
 import fs from "fs";
-import { viteHttpInstance } from "./types";
+import { LentHttpInstance } from "./types";
 
-export const getConfig = (viteHttpInstance: viteHttpInstance) => {
+export const getConfig = (lentHttpInstance: LentHttpInstance) => {
     const cwd = process.cwd();
     const configPath = path.join(cwd, "/lent.config.js");
-    let config: viteHttpInstance["config"] = {};
+    let config: LentHttpInstance["config"] = {};
     if (fs.existsSync(configPath)) {
         config = require(configPath);
     }
     if (config.plugin) {
-        config.plugin(viteHttpInstance)
+        config.plugin(lentHttpInstance)
     }
     return {
         root: cwd,

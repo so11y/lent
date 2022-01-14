@@ -1,10 +1,10 @@
 import path from "path";
 import fs from "fs";
-import { viteHttpInstance, TransformPlugin } from "./types";
+import { LentHttpInstance, TransformPlugin } from "./types";
 import type Http from "http";
 
-export const isHaveFile = (requireName: string, viteHttpInstance: viteHttpInstance) => {
-    let fileRoot = viteHttpInstance.config.root;
+export const isHaveFile = (requireName: string, lentHttpInstance: LentHttpInstance) => {
+    let fileRoot = lentHttpInstance.config.root;
     if (requireName.includes("client")) fileRoot = __dirname
     const filePath = path.join(fileRoot, requireName);
     if (fs.existsSync(filePath)) {
@@ -13,11 +13,11 @@ export const isHaveFile = (requireName: string, viteHttpInstance: viteHttpInstan
     return false;
 }
 
-export const findFile = (requireName: string, fileExit: Array<string>, viteHttpInstance: viteHttpInstance) => {
-    const f = isHaveFile(requireName, viteHttpInstance);
+export const findFile = (requireName: string, fileExit: Array<string>, lentHttpInstance: LentHttpInstance) => {
+    const f = isHaveFile(requireName, lentHttpInstance);
     if (f) return f;
     for (const exitName of fileExit) {
-        const f = isHaveFile(requireName + exitName, viteHttpInstance);
+        const f = isHaveFile(requireName + exitName, lentHttpInstance);
         if (f) {
             return f;
         }
@@ -25,9 +25,9 @@ export const findFile = (requireName: string, fileExit: Array<string>, viteHttpI
     return "";
 }
 
-export const transform = (req: Http.IncomingMessage, plugins: () => Array<TransformPlugin>, viteHttpInstance: viteHttpInstance) => {
+export const transform = (req: Http.IncomingMessage, plugins: () => Array<TransformPlugin>, lentHttpInstance: LentHttpInstance) => {
     let fileData = "";
-    const filePath = findFile(req.url, ['.js', '.ts', '.tsx', '.css'], viteHttpInstance)
+    const filePath = findFile(req.url, ['.js', '.ts', '.tsx', '.css'], lentHttpInstance)
     const filterplugins = plugins().filter(v => {
         if (req.url.endsWith(v.exit) || filePath.endsWith(v.exit)) {
             return true;
@@ -43,8 +43,8 @@ export const transform = (req: Http.IncomingMessage, plugins: () => Array<Transf
             filePath: filePath || req.url,
             requestUrl: req.url
         };
-        plugins().filter(v => v.enforce === "post").forEach(v => v.handle(fileData, fileUrl, viteHttpInstance));
-        return filterplugins.reduce((prev, next) => prev.then(value => next.transform(value, fileUrl, viteHttpInstance)), Promise.resolve(fileData));
+        plugins().filter(v => v.enforce === "post").forEach(v => v.handle(fileData, fileUrl, lentHttpInstance));
+        return filterplugins.reduce((prev, next) => prev.then(value => next.transform(value, fileUrl, lentHttpInstance)), Promise.resolve(fileData));
     }
     return Promise.resolve(null)
 }
