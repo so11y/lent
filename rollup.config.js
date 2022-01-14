@@ -31,7 +31,7 @@ export default [
 		plugins: [
 			typeScriptPlugin({
 				check: false,
-				tsconfig: path.resolve(__dirname, './tsconfig.json')
+				tsconfig: './tsconfig.json'
 			}),
 			replaces()
 		],
@@ -42,6 +42,7 @@ export default [
 		external: Object.keys(pkg.dependencies),
 		output: {
 			banner,
+			sourcemap: true,
 			file: './dist/index.js',
 			format: 'cjs'
 		}
@@ -62,7 +63,8 @@ export default [
 		output: {
 			banner,
 			file: './dist/client.js',
-			format: 'es'
+			format: 'es',
+			sourcemap: true
 		}
 	}
 ];

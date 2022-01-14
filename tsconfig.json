@@ -7,6 +7,7 @@
         "esModuleInterop": true,
         "declaration": true,
         "moduleResolution": "node",
+        "sourceMap": true
     },
     "include": [
         "./src/index.ts",
