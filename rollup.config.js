@@ -11,59 +11,58 @@ const banner = `/*!
 */`;
 
 const replaces = () => {
-    const replacesKey = {
-        __DEV__: false
-    };
-    Object.keys(replacesKey).forEach((key) => {
-        if (key in process.env) {
-            replacesKey[key] = process.env[key];
-        }
-    });
-    return rollupPluginReplace({
-        preventAssignment: true,
-        values: replacesKey
-    });
+	const replacesKey = {
+		__DEV__: false
+	};
+	Object.keys(replacesKey).forEach((key) => {
+		if (key in process.env) {
+			replacesKey[key] = process.env[key];
+		}
+	});
+	return rollupPluginReplace({
+		preventAssignment: true,
+		values: replacesKey
+	});
 };
 
-
 export default [
-    {
-        input: './src/index.ts',
-        plugins: [
-            typeScriptPlugin({
-                check: false,
-                tsconfig: path.resolve(__dirname, './tsconfig.json'),
-            }),
-            replaces(),
-        ],
-        watch: {
-            include: 'src/**',
-            exclude: 'node_modules/**'
-        },
-        external: Object.keys(pkg.dependencies),
-        output: {
-            banner,
-            file: './dist/index.js',
-            format: 'cjs'
-        }
-    },
-    {
-        input: './src/client.ts',
-        plugins: [
-            typeScriptPlugin({
-                check: false,
-                tsconfig: path.resolve(__dirname, './tsconfig.json'),
-            }),
-            replaces(),
-        ],
-        watch: {
-            include: 'src/client.ts',
-            exclude: 'node_modules/**'
-        },
-        output: {
-            banner,
-            file: './dist/client.js',
-            format: 'es'
-        }
-    }
-]
+	{
+		input: './src/index.ts',
+		plugins: [
+			typeScriptPlugin({
+				check: false,
+				tsconfig: path.resolve(__dirname, './tsconfig.json')
+			}),
+			replaces()
+		],
+		watch: {
+			include: 'src/**',
+			exclude: 'node_modules/**'
+		},
+		external: Object.keys(pkg.dependencies),
+		output: {
+			banner,
+			file: './dist/index.js',
+			format: 'cjs'
+		}
+	},
+	{
+		input: './src/client.ts',
+		plugins: [
+			typeScriptPlugin({
+				check: false,
+				tsconfig: path.resolve(__dirname, './tsconfig.json')
+			}),
+			replaces()
+		],
+		watch: {
+			include: 'src/client.ts',
+			exclude: 'node_modules/**'
+		},
+		output: {
+			banner,
+			file: './dist/client.js',
+			format: 'es'
+		}
+	}
+];
