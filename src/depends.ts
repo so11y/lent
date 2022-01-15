@@ -39,7 +39,7 @@ export const getdependsParent = (
 	depends: LentHttpInstance['depend']
 ): Array<string> => {
 	const depMap = depends.getGraph();
-	const findParents = [];
+	// const findParents = [];
 	const walkDepend = (fileName: string) => {
 		for (const [modulePath, moduleValue] of depMap) {
 			if (modulePath !== fileName) {
@@ -47,14 +47,15 @@ export const getdependsParent = (
 					(i) => i.n === normFileStarwith(fileName)
 				);
 				if (haveParent) {
-					findParents.unshift(modulePath);
-					walkDepend(modulePath);
+					// findParents.unshift(modulePath);
+					return [...walkDepend(modulePath), modulePath];
 				}
 			}
 		}
+		return [];
 	};
-	walkDepend(moduleFileName);
-	return findParents;
+	return walkDepend(moduleFileName);
+	// return findParents;
 };
 
 export const setDependsAddHash = (
