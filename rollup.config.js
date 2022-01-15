@@ -4,6 +4,8 @@ import rollupPluginReplace from '@rollup/plugin-replace';
 // import { terser } from 'rollup-plugin-terser';
 const pkg = require(path.resolve(__dirname, `package.json`));
 
+const isDev = process.argv.some((v) => v === 'dev');
+
 const banner = `/*!
 * ${pkg.name} v${pkg.version}
 * (c) ${new Date().getFullYear()} ${pkg.author.name}
@@ -31,7 +33,10 @@ export default [
 		plugins: [
 			typeScriptPlugin({
 				check: false,
-				tsconfig: './tsconfig.json'
+				tsconfig: path.resolve(__dirname, './tsconfig.json'),
+				tsconfigOverride: {
+					sourcemap: isDev
+				}
 			}),
 			replaces()
 		],
@@ -42,7 +47,7 @@ export default [
 		external: Object.keys(pkg.dependencies),
 		output: {
 			banner,
-			sourcemap: true,
+			sourcemap: isDev,
 			file: './dist/index.js',
 			format: 'cjs'
 		}
@@ -52,7 +57,10 @@ export default [
 		plugins: [
 			typeScriptPlugin({
 				check: false,
-				tsconfig: path.resolve(__dirname, './tsconfig.json')
+				tsconfig: path.resolve(__dirname, './tsconfig.json'),
+				tsconfigOverride: {
+					sourcemap: isDev
+				}
 			}),
 			replaces()
 		],
@@ -64,7 +72,7 @@ export default [
 			banner,
 			file: './dist/client.js',
 			format: 'es',
-			sourcemap: true
+			sourcemap: isDev
 		}
 	}
 ];

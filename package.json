@@ -29,7 +29,7 @@
         "dist"
     ],
     "scripts": {
-        "dev": "rollup --config --watch",
+        "dev": "rollup --config --watch dev",
         "build": "rollup --config"
     },
     "author": {
