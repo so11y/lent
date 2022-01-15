@@ -59,7 +59,7 @@ export interface LentHttpInstance {
 	depend: {
 		getGraph: () => Map<string, LentModuleDepends>;
 		getDepend: (fileName: string) => LentModuleDepends;
-		addDepend(fileName: string, lentModule: LentModuleDepends): void;
+		addDepend(fileName: string, lentModule: Partial<LentModuleDepends>): void;
 	};
 	socket: {
 		webSocket: WebSocketServer;

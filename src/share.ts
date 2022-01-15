@@ -14,3 +14,17 @@ export const normFileStarwith = (fileName: string) => {
 	}
 	return fileName;
 };
+
+export const sliceFileDotName = (str: string) => {
+	if (str && str.startsWith('./')) {
+		return str.slice(1);
+	}
+	return str;
+};
+
+export const importFileHash = (importStr: string, hash: string) => {
+	const importStrsuffix = importStr.slice(importStr.length - 1);
+	const fileSliceAfter = importStr.slice(0, importStr.length - 1);
+	const isAddSymbol = importStrsuffix === "'" ? "'" : '"';
+	return `${fileSliceAfter}?t=${hash}${isAddSymbol}`;
+};

@@ -9,8 +9,7 @@ export const handleCreateLentFileModule: LentPlugin = (l) => {
 			i.depend.addDepend(
 				file.requestUrl,
 				createLentModuleDepend({
-					requestUrl: file.requestUrl,
-					importFile: []
+					requestUrl: file.requestUrl
 				})
 			);
 			return v;

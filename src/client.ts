@@ -15,10 +15,10 @@ const importNewFile = async (hotModule: string) => {
 			const { hotModule, hot } = JSON.parse(msg.data);
 			if (hot) {
 				// eslint-disable-next-line no-empty
-				if (hotModule.parent && dataMap.has(hotModule.parent)) {
-					await importNewFile(hotModule.parent);
-				} else if (hotModule.fileName && dataMap.has(hotModule.fileName)) {
-					importNewFile(hotModule.fileName);
+				if (hotModule.fileName && dataMap.has(hotModule.fileName)) {
+					await importNewFile(hotModule.fileName);
+				} else if (hotModule.parent && dataMap.has(hotModule.parent)) {
+					importNewFile(hotModule.parent);
 				} else {
 					window.location.reload();
 				}

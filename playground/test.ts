@@ -1,2 +1,2 @@
-console.log('is test  ');
-export const t = 5777666;
+const hellowTest = 'hellow test';
+export const t = hellowTest;
