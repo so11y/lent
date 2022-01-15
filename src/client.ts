@@ -1,7 +1,8 @@
 const dataMap = new Map<string, () => void>();
-const importNewFile = async (hotModule: string) => {
-	await import(`${hotModule}?import&t=${Date.now()}`);
-	console.log(`[lent hmr] hot update file ${hotModule}`);
+const importNewFile = (hotModule: string) => {
+	import(`${hotModule}?import&t=${Date.now()}`).then(() => {
+		console.log(`[lent hmr] hot update file ${hotModule}`);
+	});
 };
 
 (() => {
@@ -10,13 +11,13 @@ const importNewFile = async (hotModule: string) => {
 	ws.addEventListener('open', () => {
 		console.log('[lent] connected');
 	});
-	ws.addEventListener('message', async (msg) => {
+	ws.addEventListener('message', (msg) => {
 		try {
 			const { hotModule, hot } = JSON.parse(msg.data);
 			if (hot) {
 				// eslint-disable-next-line no-empty
 				if (hotModule.fileName && dataMap.has(hotModule.fileName)) {
-					await importNewFile(hotModule.fileName);
+					importNewFile(hotModule.fileName);
 				} else if (hotModule.parent && dataMap.has(hotModule.parent)) {
 					importNewFile(hotModule.parent);
 				} else {
