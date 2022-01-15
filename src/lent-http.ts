@@ -1,8 +1,10 @@
 import Http from 'http';
+import path from 'path';
 import { Socket } from 'net';
 import { transform } from './handleFile';
 import { handleUrl } from './share';
 import { LentHttpInstance, Router as TypeRouter } from './types';
+const pkg = require(path.resolve(__dirname, `../package.json`));
 
 export const router = (): LentHttpInstance['router'] => {
 	const routers = new Set<TypeRouter>();
@@ -77,7 +79,7 @@ export const createHttp = (
 					);
 				})
 				.listen(lentInstance.config.port, () => {
-					console.log('lent v1.0.0 dev server running at:');
+					console.log(`lent v${pkg.version} dev server running at:`);
 					console.log(`> Local: http://localhost:${lentInstance.config.port}/`);
 					console.log(
 						`> running time ${

@@ -4,7 +4,7 @@ import rollupPluginReplace from '@rollup/plugin-replace';
 // import { terser } from 'rollup-plugin-terser';
 const pkg = require(path.resolve(__dirname, `package.json`));
 
-const isDev = process.argv.some((v) => v === 'dev');
+const isDev = process.env.LENT_DEV === 'dev';
 
 const banner = `/*!
 * ${pkg.name} v${pkg.version}
