@@ -1,14 +1,16 @@
 import path from 'path';
 import fs from 'fs';
 import { LentHttpInstance, TransformPlugin } from './types';
+import { isLentRequest } from './share';
 
 export const isHaveFile = (
 	requireName: string,
 	lentHttpInstance: LentHttpInstance
 ) => {
 	let fileRoot = lentHttpInstance.config.root;
-	if (requireName.includes('client')) fileRoot = __dirname;
-	const filePath = path.join(fileRoot, requireName);
+	const converFileName = isLentRequest(requireName);
+	if (converFileName.includes('client')) fileRoot = __dirname;
+	const filePath = path.join(fileRoot, converFileName);
 	if (fs.existsSync(filePath)) {
 		return filePath;
 	}

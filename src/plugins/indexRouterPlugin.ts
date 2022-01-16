@@ -26,7 +26,7 @@ export const indexRouterPlugin: LentPlugin = (l) => {
 					l.socket.sendSocket({
 						hotModule: {
 							fileName: indexPath,
-							parent: null
+							parent: []
 						},
 						hot: true
 					});

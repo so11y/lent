@@ -1,5 +1,5 @@
 import { parse, init } from 'es-module-lexer';
-import { importFileHash, sliceFileDotName } from '../share';
+import { getLastFileName, importFileHash, sliceFileDotName } from '../share';
 import { LentPlugin } from './preCompose';
 
 export const handleFileImportPlugin: LentPlugin = (l) => {
@@ -15,7 +15,11 @@ export const handleFileImportPlugin: LentPlugin = (l) => {
 			return imports.reduce((prev, next) => {
 				if (next) {
 					const importStr = v.substring(next.ss, next.se);
-					const childModule = i.depend.getDepend(sliceFileDotName(next.n));
+					const [lastModulePath] = getLastFileName(file.requestUrl);
+
+					const childModule = i.depend.getDepend(
+						sliceFileDotName(lastModulePath) + sliceFileDotName(next.n)
+					);
 					if (childModule && childModule.hash) {
 						return prev.replace(
 							importStr,

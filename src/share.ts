@@ -28,3 +28,17 @@ export const importFileHash = (importStr: string, hash: string) => {
 	const isAddSymbol = importStrsuffix === "'" ? "'" : '"';
 	return `${fileSliceAfter}?t=${hash}${isAddSymbol}`;
 };
+
+export const isLentRequest = (str: string) => {
+	if (str.startsWith('/@lent')) {
+		return str.replace('/@lent', '');
+	}
+	return str;
+};
+
+export const getLastFileName = (fileName: string) => {
+	const lastFileIndex = fileName.lastIndexOf('/');
+	const lastFileName = fileName.slice(lastFileIndex);
+	const startPath = fileName.slice(0, lastFileIndex);
+	return [startPath, lastFileName];
+};

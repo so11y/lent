@@ -6,7 +6,7 @@ export const indexHtmlAddClientPlugin: LentPlugin = (l) => {
 		name: 'indexHtmlAddClientPlugin',
 		transform(v) {
 			const $ = cheerio.load(v);
-			$('head').append(`<script type='module' src='./client' />`);
+			$('head').append(`<script type='module' src='/@lent/client' />`);
 			return $.html();
 		}
 	});

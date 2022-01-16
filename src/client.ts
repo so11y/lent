@@ -2,6 +2,7 @@ const dataMap = new Map<string, () => void>();
 const importNewFile = (hotModule: string) => {
 	import(`${hotModule}?import&t=${Date.now()}`).then(() => {
 		console.log(`[lent hmr] hot update file ${hotModule}`);
+		dataMap.get(hotModule)?.();
 	});
 };
 
@@ -15,11 +16,13 @@ const importNewFile = (hotModule: string) => {
 		try {
 			const { hotModule, hot } = JSON.parse(msg.data);
 			if (hot) {
+				const getParents = hotModule.parent.filter((v) => dataMap.has(v));
+				const findLatelyHotParent = getParents[getParents.length - 1];
 				// eslint-disable-next-line no-empty
 				if (hotModule.fileName && dataMap.has(hotModule.fileName)) {
 					importNewFile(hotModule.fileName);
-				} else if (hotModule.parent && dataMap.has(hotModule.parent)) {
-					importNewFile(hotModule.parent);
+				} else if (findLatelyHotParent) {
+					importNewFile(findLatelyHotParent);
 				} else {
 					window.location.reload();
 				}

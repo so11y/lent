@@ -14,7 +14,7 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
 			l.socket.sendSocket({
 				hotModule: {
 					fileName: requestUrl,
-					parent: moduleParent[0]
+					parent: moduleParent
 				},
 				hot: true
 			});

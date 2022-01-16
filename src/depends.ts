@@ -1,5 +1,5 @@
 import { ImportSpecifier } from 'es-module-lexer';
-import { normFileStarwith } from './share';
+import { normFileStarwith, getLastFileName } from './share';
 import { LentHttpInstance } from './types';
 
 export interface LentModuleDepends {
@@ -42,9 +42,14 @@ export const getdependsParent = (
 	// const findParents = [];
 	const walkDepend = (fileName: string) => {
 		for (const [modulePath, moduleValue] of depMap) {
+			const [lastStartPath, lastFileName] = getLastFileName(fileName);
+			const [lastModulePath] = getLastFileName(modulePath);
+			const covFileName =
+				lastModulePath === lastStartPath ? lastFileName : fileName;
+
 			if (modulePath !== fileName) {
 				const haveParent = moduleValue.importFile.some(
-					(i) => i.n === normFileStarwith(fileName)
+					(i) => i.n === normFileStarwith(covFileName)
 				);
 				if (haveParent) {
 					// findParents.unshift(modulePath);
