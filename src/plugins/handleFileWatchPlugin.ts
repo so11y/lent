@@ -28,6 +28,7 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
 			addFileChange(i, file, () => {
 				setFileEtag(file.requestUrl, true);
 			});
+			return v;
 		}
 	});
 };
