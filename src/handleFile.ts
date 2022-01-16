@@ -64,14 +64,25 @@ export const transform = (
 			filePath: filePath || requestFileName,
 			requestUrl: requestFileName
 		};
-		plugins()
+		return plugins()
 			.filter((v) => v.enforce === 'post')
-			.forEach((v) => v.handle(fileData, fileUrl, lentHttpInstance));
-		return filterplugins.reduce(
-			(prev, next) =>
-				prev.then((value) => next.transform(value, fileUrl, lentHttpInstance)),
-			Promise.resolve(fileData)
-		);
+			.reduce(
+				(prev, next) =>
+					prev.then((value) => next.handle(value, fileUrl, lentHttpInstance)),
+				Promise.resolve(fileData)
+			)
+			.then((fileSoruce) => {
+				return filterplugins.reduce(
+					(prev, next) =>
+						prev.then((value) =>
+							next.transform(value, fileUrl, lentHttpInstance)
+						),
+					Promise.resolve(fileSoruce)
+				);
+			})
+			.catch((e) => {
+				console.log('[lent error]', e.message);
+			});
 	}
 	return Promise.resolve(null);
 };

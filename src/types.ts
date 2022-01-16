@@ -20,7 +20,7 @@ export interface TransformPlugin {
 		fileData: string,
 		fileUrl: FileUrl,
 		lentHttpInstance?: LentHttpInstance
-	) => void;
+	) => string | Promise<string>;
 	transform?: (
 		fileData: string,
 		fileUrl: {
