@@ -1,3 +1,5 @@
 interface ImportMeta {
-	hot: any;
+	hot: {
+		accept: (callback: (...arg: []) => unknown) => void;
+	};
 }
