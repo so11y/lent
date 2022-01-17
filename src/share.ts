@@ -29,11 +29,11 @@ export const importFileHash = (importStr: string, hash: string) => {
 	return `${fileSliceAfter}?t=${hash}${isAddSymbol}`;
 };
 
-export const isLentRequest = (str: string) => {
+export const isLentRequest = (str: string): [string, boolean] => {
 	if (str.startsWith('/@lent')) {
-		return str.replace('/@lent', '');
+		return [str.replace('/@lent', ''), true];
 	}
-	return str;
+	return [str, false];
 };
 
 export const getLastFileName = (fileName: string) => {
@@ -41,4 +41,16 @@ export const getLastFileName = (fileName: string) => {
 	const lastFileName = fileName.slice(lastFileIndex);
 	const startPath = fileName.slice(0, lastFileIndex);
 	return [startPath, lastFileName];
+};
+
+export const isNodeModuleFile = (fileName: string) => {
+	if (
+		fileName &&
+		!fileName.startsWith('/') &&
+		!fileName.startsWith('./') &&
+		!fileName.endsWith('.')
+	) {
+		return true;
+	}
+	return false;
 };

@@ -10,23 +10,16 @@ export interface Router {
 export interface FileUrl {
 	requestUrl: string;
 	filePath: string;
+	isLentModule: boolean;
 }
 export interface TransformPlugin {
 	exit?: string;
 	exits?: Array<string>;
 	name?: string;
 	enforce?: 'post' | 'pre';
-	handle?: (
-		fileData: string,
-		fileUrl: FileUrl,
-		lentHttpInstance?: LentHttpInstance
-	) => string | Promise<string>;
 	transform?: (
 		fileData: string,
-		fileUrl: {
-			requestUrl: string;
-			filePath: string;
-		},
+		fileUrl: FileUrl,
 		lentHttpInstance?: LentHttpInstance
 	) => string | Promise<string>;
 }

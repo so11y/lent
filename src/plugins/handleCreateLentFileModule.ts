@@ -5,11 +5,12 @@ export const handleCreateLentFileModule: LentPlugin = (l) => {
 	l.plugin.addPlugins({
 		name: 'handleCreateLentFileModule',
 		enforce: 'post',
-		handle(v, file, i) {
+		transform(v, file, i) {
 			i.depend.addDepend(
 				file.requestUrl,
 				createLentModuleDepend({
-					requestUrl: file.requestUrl
+					requestUrl: file.requestUrl,
+					isNotLentModule: file.isLentModule
 				})
 			);
 			return v;

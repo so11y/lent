@@ -1,9 +1,11 @@
-// import { t } from './test';
 import { t } from './code/a';
 import './index.css';
+// import roll from 'rollup';
 
-console.log('hello wolrd index file');
-console.log(t);
+// console.log(roll);
+
+console.log('hello wolrd');
+console.log(t, 'good');
 
 if (import.meta.hot) {
 	import.meta.hot.accept(() => {
