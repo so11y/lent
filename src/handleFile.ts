@@ -21,16 +21,17 @@ export const isHaveFile = (
 	} else if (isLentStart) {
 		fileRoot = process.cwd();
 		try {
-			let filePath = '';
 			const fileMainEnter = require(path.join(
 				process.cwd(),
 				'/node_modules',
 				converFileName,
 				'/package.json'
 			));
-			filePath = fileMainEnter.module || fileMainEnter.main;
-
-			converFileName = path.join('/node_modules', converFileName, filePath);
+			converFileName = path.join(
+				'/node_modules',
+				converFileName,
+				fileMainEnter
+			);
 		} catch (e) {
 			console.warn(
 				`[lent warn] no find module ${converFileName} do you have insatll ?`
