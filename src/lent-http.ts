@@ -59,7 +59,8 @@ export const createHttp = (
 							return res.end(
 								indexHtmlPlugin.transform(item!.handler().toString(), {
 									filePath: 'index.html',
-									requestUrl: requestFileName
+									requestUrl: requestFileName,
+									isLentModule: true
 								})
 							);
 						}
