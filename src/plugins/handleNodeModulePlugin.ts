@@ -11,6 +11,9 @@ export const handleNodeModulePlugin: LentPlugin = (l) => {
 			if (!file.isLentModule) {
 				const bundle = await rollup.rollup({
 					input: file.filePath,
+                    onwarn(){
+
+                    },
 					plugins: [
 						commonjs(),
 						replace({
