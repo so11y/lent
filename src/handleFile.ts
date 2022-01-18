@@ -26,13 +26,15 @@ export const isHaveFile = (
 				'/node_modules',
 				converFileName,
 				'/package.json'
-			));
+			)).main;
+
 			converFileName = path.join(
 				'/node_modules',
 				converFileName,
 				fileMainEnter
 			);
 		} catch (e) {
+			console.log(e, 'e');
 			console.warn(
 				`[lent warn] no find module ${converFileName} do you have insatll ?`
 			);

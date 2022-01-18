@@ -8,6 +8,7 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
 		dependModule.etag = Date.now().toString();
 		if (isSend) {
 			const moduleParent = getdependsParent(requestUrl, l.depend);
+            console.log(moduleParent," file.isLentModule",);
 			if (moduleParent.length) {
 				setDependsAddHash([...moduleParent.slice(1), requestUrl], l.depend);
 			}
@@ -25,6 +26,7 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
 		enforce: 'post',
 		transform: (v, file, i) => {
 			const dependModule = i.depend.getDepend(file.requestUrl);
+
 			if (dependModule && file.filePath && file.isLentModule) {
 				setFileEtag(file.requestUrl, false);
 				addFileChange(i, file, () => {

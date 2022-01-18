@@ -1,9 +1,9 @@
 import { createLentModuleDepend } from '../depends';
 import { LentPlugin } from './preCompose';
 
-export const handleCreateLentFileModule: LentPlugin = (l) => {
+export const handleCreateLentFileModulePlugin: LentPlugin = (l) => {
 	l.plugin.addPlugins({
-		name: 'handleCreateLentFileModule',
+		name: 'handleCreateLentFileModulePlugin',
 		enforce: 'post',
 		transform(v, file, i) {
 			i.depend.addDepend(

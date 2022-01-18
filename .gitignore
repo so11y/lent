@@ -6,3 +6,4 @@ dist-ssr
 .history
 pnpm-lock.yaml
 coverage
+package-lock.json
