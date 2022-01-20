@@ -1,11 +1,15 @@
 import chokidar from 'chokidar';
+import Http from 'http';
 import { WebSocketServer } from 'ws';
 import { LentModuleDepends } from './depends';
 
 export interface Router {
 	method: string;
 	path: string;
-	handler: () => string | Buffer;
+	handler: (
+		req: Http.IncomingMessage,
+		res: Http.ServerResponse
+	) => string | Buffer;
 }
 export interface FileUrl {
 	requestUrl: string;
