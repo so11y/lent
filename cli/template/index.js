@@ -1,6 +1,7 @@
 const fs = require('fs');
 const ejs = require('ejs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 const createTemplate = (options) => {
 	const root = path.join(process.cwd(), '/src');
@@ -10,7 +11,9 @@ const createTemplate = (options) => {
 		renderFile('createHtml.ejs', 'index.html', {
 			g: isJs
 		}),
-		renderFile('enterFile.ejs', `index${isJs ? '.js' : '.ts'}`)
+		renderFile('enterFile.ejs', `index${isJs ? '.js' : '.ts'}`, {
+			g: options.leetcode
+		})
 	];
 	const renderRoot = [
 		renderFile('lent.config.ejs', 'lent.config.js', {
@@ -39,6 +42,10 @@ const createTemplate = (options) => {
 			fs.writeFileSync(path.join(root, v.fileName), v.source)
 		);
 		console.log('[lent cli] created template end');
+		spawn('npm', ['i', 'lentleetcodeplugin'], {
+			shell: true,
+			stdio: 'inherit'
+		});
 	}
 };
 
