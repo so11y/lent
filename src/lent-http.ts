@@ -58,7 +58,7 @@ export const createHttp = (
 						const indexHtmlPlugin = plugins
 							.getPlugins()
 							.find((v) => v.name === 'indexHtmlAddClientPlugin');
-						if (indexHtmlPlugin) {
+						if (indexHtmlPlugin && requestFileName === '/') {
 							return res.end(
 								indexHtmlPlugin.transform(item!.handler(req, res).toString(), {
 									filePath: 'index.html',
@@ -67,7 +67,9 @@ export const createHttp = (
 								})
 							);
 						}
-						return Promise.resolve(item?.handler(req, res)).then(res.end);
+						return Promise.resolve(item?.handler(req, res)).then((v) =>
+							res.end(v)
+						);
 					}
 
 					transform(requestFileName, plugins.getPlugins, lentInstance).then(

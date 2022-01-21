@@ -12,10 +12,21 @@ const createTemplate = (options) => {
 		}),
 		renderFile('enterFile.ejs', `index${isJs ? '.js' : '.ts'}`)
 	];
-	const renderRoot = [renderFile('lent.config.ejs', 'lent.config.js')];
+	const renderRoot = [
+		renderFile('lent.config.ejs', 'lent.config.js', {
+			g: options.leetcode
+		})
+	];
 	if (!isJs) {
 		renderSrcCode.push(renderFile('index.d.ejs', 'index.d.ts'));
 		renderRoot.push(renderFile('tsconfig.ejs', 'tsconfig.json'));
+		if (options.leetcode) {
+			renderSrcCode.push(
+				renderFile('share.ejs', 'share.ts', {
+					g: true
+				})
+			);
+		}
 	}
 	if (fs.existsSync(root)) {
 		console.log('[lent cli] have src path remove to again');
