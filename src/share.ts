@@ -48,6 +48,7 @@ export const isNodeModuleFile = (fileName: string) => {
 		fileName &&
 		!fileName.startsWith('/') &&
 		!fileName.startsWith('./') &&
+		!fileName.startsWith('../') &&
 		!fileName.endsWith('.')
 	) {
 		return true;
