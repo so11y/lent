@@ -42,7 +42,7 @@ const createTemplate = (options) => {
 			fs.writeFileSync(path.join(root, v.fileName), v.source)
 		);
 		console.log('[lent cli] created template end');
-		spawn('npm', ['i', 'lentleetcodeplugin'], {
+		spawn('npm', ['i', 'lentleetcodeplugin lentleetviewplugin'], {
 			shell: true,
 			stdio: 'inherit'
 		});
