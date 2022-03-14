@@ -3,34 +3,77 @@ import fs from 'fs';
 import { LentHttpInstance, TransformPlugin } from './types';
 import { isLentRequest } from './share';
 
+/**
+ * 这块需要重点重构
+ */
 export const isHaveFile = (
 	requireName: string,
+	rawRequireName: string,
 	lentHttpInstance: LentHttpInstance
-) => {
+): [string, boolean] => {
 	let fileRoot = lentHttpInstance.config.root;
-	const converFileName = isLentRequest(requireName);
-	if (converFileName.includes('client')) fileRoot = __dirname;
-	const filePath = path.join(fileRoot, converFileName);
-	if (fs.existsSync(filePath)) {
-		return filePath;
+	// eslint-disable-next-line prefer-const
+	let [converFileName, isLentStart] = isLentRequest(rawRequireName);
+
+	if (isLentStart && converFileName.includes('client')) {
+		fileRoot = __dirname;
+		converFileName += '.js';
+	} else if (isLentStart) {
+		fileRoot = process.cwd();
+		try {
+			const fileMainEnter = require(path.join(
+				process.cwd(),
+				'/node_modules',
+				converFileName,
+				'/package.json'
+			)).main;
+
+			converFileName = path.join(
+				'/node_modules',
+				converFileName,
+				fileMainEnter
+			);
+		} catch (e) {
+			console.log(e, 'e');
+			console.warn(
+				`[lent warn] no find module ${converFileName} do you have insatll ?`
+			);
+			return ['', false];
+		}
+	} else {
+		converFileName = requireName;
 	}
-	return false;
+
+	const filePath = path.join(fileRoot, converFileName);
+
+	if (fs.existsSync(filePath)) {
+		return [filePath, isLentStart];
+	}
+	return ['', isLentStart];
 };
 
 export const findFile = (
 	requireName: string,
 	fileExit: Array<string>,
 	lentHttpInstance: LentHttpInstance
-) => {
-	const f = isHaveFile(requireName, lentHttpInstance);
-	if (f) return f;
+): [string, boolean] => {
+	const [f, isLentModule] = isHaveFile(
+		requireName,
+		requireName,
+		lentHttpInstance
+	);
+	if (f) return [f, isLentModule];
 	for (const exitName of fileExit) {
-		const f = isHaveFile(requireName + exitName, lentHttpInstance);
+		const [f, isLentModule] = isHaveFile(
+			requireName + exitName,
+			requireName,
+			lentHttpInstance
+		);
 		if (f) {
-			return f;
+			return [f, isLentModule];
 		}
 	}
-	return '';
+	return ['', isLentModule];
 };
 
 export const transform = (
@@ -38,8 +81,12 @@ export const transform = (
 	plugins: () => Array<TransformPlugin>,
 	lentHttpInstance: LentHttpInstance
 ) => {
+	if (requestFileName.endsWith('.map')) {
+		return Promise.resolve(null);
+	}
+
 	let fileData = '';
-	const filePath = findFile(
+	const [filePath, isLentModule] = findFile(
 		requestFileName,
 		['.js', '.ts', '.css'],
 		lentHttpInstance
@@ -61,17 +108,32 @@ export const transform = (
 	}
 	if (filterplugins.length) {
 		const fileUrl = {
-			filePath: filePath || requestFileName,
-			requestUrl: requestFileName
+			filePath,
+			requestUrl: requestFileName,
+			isLentModule: !isLentModule
 		};
-		plugins()
+		//这里可以单独抽离为一个库
+		return plugins()
 			.filter((v) => v.enforce === 'post')
-			.forEach((v) => v.handle(fileData, fileUrl, lentHttpInstance));
-		return filterplugins.reduce(
-			(prev, next) =>
-				prev.then((value) => next.transform(value, fileUrl, lentHttpInstance)),
-			Promise.resolve(fileData)
-		);
+			.reduce(
+				(prev, next) =>
+					prev.then((value) =>
+						next.transform(value, fileUrl, lentHttpInstance)
+					),
+				Promise.resolve(fileData)
+			)
+			.then((fileSoruce) => {
+				return filterplugins.reduce(
+					(prev, next) =>
+						prev.then((value) =>
+							next.transform(value, fileUrl, lentHttpInstance)
+						),
+					Promise.resolve(fileSoruce)
+				);
+			})
+			.catch((e) => {
+				console.log('[lent error]', e.message);
+			});
 	}
 	return Promise.resolve(null);
 };

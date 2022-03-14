@@ -1,6 +1,7 @@
 const fs = require('fs');
 const ejs = require('ejs');
 const path = require('path');
+const { spawn } = require('child_process');
 
 const createTemplate = (options) => {
 	const root = path.join(process.cwd(), '/src');
@@ -10,12 +11,25 @@ const createTemplate = (options) => {
 		renderFile('createHtml.ejs', 'index.html', {
 			g: isJs
 		}),
-		renderFile('enterFile.ejs', `index${isJs ? '.js' : '.ts'}`)
+		renderFile('enterFile.ejs', `index${isJs ? '.js' : '.ts'}`, {
+			g: options.leetcode
+		})
 	];
-	const renderRoot = [renderFile('lent.config.ejs', 'lent.config.js')];
+	const renderRoot = [
+		renderFile('lent.config.ejs', 'lent.config.js', {
+			g: options.leetcode
+		})
+	];
 	if (!isJs) {
 		renderSrcCode.push(renderFile('index.d.ejs', 'index.d.ts'));
 		renderRoot.push(renderFile('tsconfig.ejs', 'tsconfig.json'));
+		if (options.leetcode) {
+			renderSrcCode.push(
+				renderFile('share.ejs', 'share.ts', {
+					g: true
+				})
+			);
+		}
 	}
 	if (fs.existsSync(root)) {
 		console.log('[lent cli] have src path remove to again');
@@ -28,6 +42,10 @@ const createTemplate = (options) => {
 			fs.writeFileSync(path.join(root, v.fileName), v.source)
 		);
 		console.log('[lent cli] created template end');
+		spawn('npm', ['i', 'lentleetcodeplugin lentleetviewplugin'], {
+			shell: true,
+			stdio: 'inherit'
+		});
 	}
 };
 

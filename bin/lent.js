@@ -11,6 +11,7 @@ program
 	.command('template')
 	.option('--js', 'created javaScript template to cwd', false)
 	.option('--ts', 'created typeScript template to cwd', false)
+	.option('--leetcode', 'created typeScript template to cwd', false)
 	.description('[lent cli] create template')
 	.action(createTemplate);
 

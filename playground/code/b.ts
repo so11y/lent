@@ -1,1 +1,1 @@
-export const th = 'hello b.ts555';
+export const th = 'hello b.ts';

@@ -20,7 +20,8 @@ export const indexRouterPlugin: LentPlugin = (l) => {
 				l,
 				{
 					filePath: indexPath,
-					requestUrl: indexPath
+					requestUrl: indexPath,
+                    isLentModule:true
 				},
 				() => {
 					l.socket.sendSocket({

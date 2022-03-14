@@ -39,9 +39,12 @@ export const createHttp = (
 				.on('request', (req, res) => {
 					const [requestFileName, isHot] = handleUrl(req.url);
 
-					const etag = lentInstance.depend.getDepend(requestFileName)?.etag;
-
-					if (etag && req.headers['if-none-match'] === etag) {
+					const model = lentInstance.depend.getDepend(requestFileName);
+					if (
+						model &&
+						(req.headers['if-none-match'] === model.etag ||
+							model.isNotLentModule === false)
+					) {
 						res.statusCode = 304;
 						return res.end();
 					}
@@ -55,15 +58,18 @@ export const createHttp = (
 						const indexHtmlPlugin = plugins
 							.getPlugins()
 							.find((v) => v.name === 'indexHtmlAddClientPlugin');
-						if (indexHtmlPlugin) {
+						if (indexHtmlPlugin && requestFileName === '/') {
 							return res.end(
-								indexHtmlPlugin.transform(item!.handler().toString(), {
+								indexHtmlPlugin.transform(item!.handler(req, res).toString(), {
 									filePath: 'index.html',
-									requestUrl: requestFileName
+									requestUrl: requestFileName,
+									isLentModule: true
 								})
 							);
 						}
-						return res.end(item?.handler());
+						return Promise.resolve(item?.handler(req, res)).then((v) =>
+							res.end(v)
+						);
 					}
 
 					transform(requestFileName, plugins.getPlugins, lentInstance).then(

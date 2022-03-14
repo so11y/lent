@@ -7,6 +7,7 @@ export interface LentModuleDepends {
 	etag: string;
 	requestUrl: string;
 	hash: string;
+	isNotLentModule: boolean;
 }
 
 export const createLentModuleDepend = <T extends Partial<LentModuleDepends>>(
@@ -17,6 +18,7 @@ export const createLentModuleDepend = <T extends Partial<LentModuleDepends>>(
 		requestUrl: '',
 		importFile: [],
 		hash: '',
+		isNotLentModule: true,
 		...m
 	};
 };

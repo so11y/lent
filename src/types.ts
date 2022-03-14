@@ -1,32 +1,29 @@
 import chokidar from 'chokidar';
+import Http from 'http';
 import { WebSocketServer } from 'ws';
 import { LentModuleDepends } from './depends';
 
 export interface Router {
 	method: string;
 	path: string;
-	handler: () => string | Buffer;
+	handler: (
+		req: Http.IncomingMessage,
+		res: Http.ServerResponse
+	) => string | Buffer;
 }
 export interface FileUrl {
 	requestUrl: string;
 	filePath: string;
+	isLentModule: boolean;
 }
 export interface TransformPlugin {
 	exit?: string;
 	exits?: Array<string>;
 	name?: string;
 	enforce?: 'post' | 'pre';
-	handle?: (
-		fileData: string,
-		fileUrl: FileUrl,
-		lentHttpInstance?: LentHttpInstance
-	) => void;
 	transform?: (
 		fileData: string,
-		fileUrl: {
-			requestUrl: string;
-			filePath: string;
-		},
+		fileUrl: FileUrl,
 		lentHttpInstance?: LentHttpInstance
 	) => string | Promise<string>;
 }

@@ -1,5 +1,18 @@
 const { defineLentConfig } = require('lent');
 
+<% if(g) { %>
+    const {lentLeetCodePlugin} = require('lentleetcodeplugin')
+    const {lentLeetViewPlugin} = require('lentleetviewplugin')
+<% }  %>
+
+
+
 module.exports = defineLentConfig({
-	root: './src'
+	root: './src',
+    <% if(g) { %>
+    plugin(i) {
+        lentLeetCodePlugin(i);
+        lentLeetViewPlugin(i);
+    }
+    <% }  %>
 });

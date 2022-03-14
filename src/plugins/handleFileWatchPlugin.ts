@@ -23,11 +23,14 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
 	l.plugin.addPlugins({
 		name: 'handleFileWatchPlugin',
 		enforce: 'post',
-		handle: (v, file, i) => {
-			setFileEtag(file.requestUrl, false);
-			addFileChange(i, file, () => {
-				setFileEtag(file.requestUrl, true);
-			});
+		transform: (v, file, i) => {
+			const dependModule = i.depend.getDepend(file.requestUrl);
+            setFileEtag(file.requestUrl, false);
+			if (dependModule && file.filePath && file.isLentModule) {
+				addFileChange(i, file, () => {
+					setFileEtag(file.requestUrl, true);
+				});
+			}
 			return v;
 		}
 	});
