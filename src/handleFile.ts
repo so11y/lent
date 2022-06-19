@@ -20,7 +20,7 @@ const findPackage = (moduleName) => {
 	});
 };
 
-const whiteNames = ['/client'];
+const whiteNames = ['client'];
 
 /**
  * 这块需要重点重构
@@ -45,7 +45,7 @@ export const isHaveFile = async (
 			if (filePackage.module) {
 				isModulesFile = true;
 			}
-			convertFileName = fileRoot;
+			convertFileName = path.join('/node_modules', convertFileName, fileRoot);
 		} catch (e) {
 			console.warn(
 				`[lent warn] no find module ${convertFileName} do you have install ?`

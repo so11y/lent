@@ -23,8 +23,8 @@ export const sliceFileDotName = (str: string) => {
 };
 
 export const isLentRequest = (str: string): [string, boolean] => {
-	if (str.startsWith('/@lent')) {
-		return [str.replace('/@lent', ''), true];
+	if (str.startsWith('/@lent/')) {
+		return [str.replace('/@lent/', ''), true];
 	}
 	return [str, false];
 };
