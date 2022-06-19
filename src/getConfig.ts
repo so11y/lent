@@ -15,6 +15,7 @@ export const getConfig = (lentHttpInstance: LentHttpInstance) => {
 	return {
 		root: cwd,
 		port: 3000,
+		extensions: ['.js', '.ts', '.css'],
 		...config
 	};
 };

@@ -28,3 +28,7 @@ export const lent = (): LentHttpInstance => {
 	applyComposePlugin(lentInstance_);
 	return lentInstance_;
 };
+
+if (process.env.LENT_DEV) {
+	lent().http.start();
+}

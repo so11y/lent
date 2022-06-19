@@ -38,12 +38,11 @@ export const createHttp = (
 			http
 				.on('request', (req, res) => {
 					const [requestFileName, isHot] = handleUrl(req.url);
-
 					const model = lentInstance.depend.getDepend(requestFileName);
 					if (
 						model &&
 						(req.headers['if-none-match'] === model.etag ||
-							model.isNotLentModule === false)
+							model.isLentModule === true)
 					) {
 						res.statusCode = 304;
 						return res.end();
@@ -60,10 +59,11 @@ export const createHttp = (
 							.find((v) => v.name === 'indexHtmlAddClientPlugin');
 						if (indexHtmlPlugin && requestFileName === '/') {
 							return res.end(
-								indexHtmlPlugin.transform(item!.handler(req, res).toString(), {
+								indexHtmlPlugin.transform(item?.handler(req, res).toString(), {
 									filePath: 'index.html',
 									requestUrl: requestFileName,
-									isLentModule: true
+									isLentModule: true,
+									isModulesFile: false
 								})
 							);
 						}

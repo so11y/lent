@@ -15,6 +15,7 @@ export interface FileUrl {
 	requestUrl: string;
 	filePath: string;
 	isLentModule: boolean;
+	isModulesFile: boolean;
 }
 export interface TransformPlugin {
 	exit?: string;
@@ -68,5 +69,6 @@ export interface LentHttpInstance {
 		root?: string;
 		port?: number;
 		plugin?: (v: LentHttpInstance) => void;
+		extensions?: Array<string>;
 	};
 }

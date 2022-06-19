@@ -1,3 +1,7 @@
+
+1. 可以理解为乞丐版的vite
+2. 主要用于自己本地开箱即用
+
 1 . npm i lent
 
 2.  npx lent tempalte (--leetcode or --js --ts)

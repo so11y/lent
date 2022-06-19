@@ -8,7 +8,7 @@ export const handleUrl = (fileUrl: string) => {
 	return fileUrl.split('?');
 };
 
-export const normFileStarwith = (fileName: string) => {
+export const normFileStartWith = (fileName: string) => {
 	if (fileName.startsWith('/')) {
 		return `.${fileName}`;
 	}
@@ -46,10 +46,7 @@ export const getLastFileName = (fileName: string) => {
 export const isNodeModuleFile = (fileName: string) => {
 	if (
 		fileName &&
-		!fileName.startsWith('/') &&
-		!fileName.startsWith('./') &&
-		!fileName.startsWith('../') &&
-		!fileName.endsWith('.')
+		['/', './', '../', '.'].every((v) => !fileName.startsWith(v))
 	) {
 		return true;
 	}

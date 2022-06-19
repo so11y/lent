@@ -2,8 +2,6 @@ import { TransformPlugin, LentHttpInstance } from '../types';
 import { indexRouterPlugin } from './indexRouterPlugin';
 import { handleCssPlugin } from './handleCssPlugin';
 import { indexHtmlAddClientPlugin } from './indexHtmlAddClientPlugin';
-import { handleJsPlugin } from './handleJsPlugin';
-import { handleTsPlugin } from './handleTsPlugin';
 import { handleFileImportPlugin } from './handleFileImportPlugin';
 import { handleFileWatchPlugin } from './handleFileWatchPlugin';
 import { handleSocketPortPlugin } from './handleSocketPortPlugin';
@@ -29,15 +27,13 @@ export const preCompose = (): Array<LentPlugin> => {
 	return [
 		indexRouterPlugin,
 		indexHtmlAddClientPlugin,
-		handleJsPlugin,
 		handleCssPlugin,
-		handleTsPlugin,
 		handleFileImportPlugin,
-		handleSocketPortPlugin,
 		handleCreateLentFileModulePlugin,
 		handleFileWatchPlugin,
+		handleNodeModulePlugin,
 		handleInjectClientPlugin,
-		handleNodeModulePlugin
+		handleSocketPortPlugin
 	];
 };
 

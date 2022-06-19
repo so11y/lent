@@ -1,5 +1,5 @@
 import { ImportSpecifier } from 'es-module-lexer';
-import { normFileStarwith, getLastFileName } from './share';
+import { normFileStartWith, getLastFileName } from './share';
 import { LentHttpInstance } from './types';
 
 export interface LentModuleDepends {
@@ -7,7 +7,8 @@ export interface LentModuleDepends {
 	etag: string;
 	requestUrl: string;
 	hash: string;
-	isNotLentModule: boolean;
+	isLentModule: boolean;
+	isModulesFile: boolean;
 }
 
 export const createLentModuleDepend = <T extends Partial<LentModuleDepends>>(
@@ -18,7 +19,8 @@ export const createLentModuleDepend = <T extends Partial<LentModuleDepends>>(
 		requestUrl: '',
 		importFile: [],
 		hash: '',
-		isNotLentModule: true,
+		isLentModule: true,
+		isModulesFile: false,
 		...m
 	};
 };
@@ -36,7 +38,7 @@ export const depends = (): LentHttpInstance['depend'] => {
 	};
 };
 
-export const getdependsParent = (
+export const getDependsParent = (
 	moduleFileName: string,
 	depends: LentHttpInstance['depend']
 ): Array<string> => {
@@ -51,7 +53,7 @@ export const getdependsParent = (
 
 			if (modulePath !== fileName) {
 				const haveParent = moduleValue.importFile.some(
-					(i) => i.n === normFileStarwith(covFileName)
+					(i) => i.n === normFileStartWith(covFileName)
 				);
 				if (haveParent) {
 					// findParents.unshift(modulePath);

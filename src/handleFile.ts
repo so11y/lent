@@ -3,6 +3,7 @@ import fs from 'fs';
 import { LentHttpInstance, TransformPlugin } from './types';
 import { isLentRequest } from './share';
 
+const whiteNames = ['/client'];
 /**
  * 这块需要重点重构
  */
@@ -10,59 +11,57 @@ export const isHaveFile = (
 	requireName: string,
 	rawRequireName: string,
 	lentHttpInstance: LentHttpInstance
-): [string, boolean] => {
+): [string, boolean, boolean] => {
 	let fileRoot = lentHttpInstance.config.root;
+	let isModulesFile = false;
 	// eslint-disable-next-line prefer-const
-	let [converFileName, isLentStart] = isLentRequest(rawRequireName);
-
-	if (isLentStart && converFileName.includes('client')) {
+	let [convertFileName, isLentStart] = isLentRequest(rawRequireName);
+	if (isLentStart && whiteNames.some((v) => convertFileName === v)) {
 		fileRoot = __dirname;
-		converFileName += '.js';
+		convertFileName += '.js';
 	} else if (isLentStart) {
 		fileRoot = process.cwd();
 		try {
-			const fileMainEnter = require(path.join(
+			const filePackage = require(path.join(
 				process.cwd(),
 				'/node_modules',
-				converFileName,
+				convertFileName,
 				'/package.json'
-			)).main;
-
-			converFileName = path.join(
-				'/node_modules',
-				converFileName,
-				fileMainEnter
-			);
+			));
+			const fileRoot = filePackage.module || filePackage.main;
+			if (filePackage.module) {
+				isModulesFile = true;
+			}
+			convertFileName = path.join('/node_modules', convertFileName, fileRoot);
 		} catch (e) {
-			console.log(e, 'e');
 			console.warn(
-				`[lent warn] no find module ${converFileName} do you have insatll ?`
+				`[lent warn] no find module ${convertFileName} do you have install ?`
 			);
-			return ['', false];
+			return ['', false, false];
 		}
 	} else {
-		converFileName = requireName;
+		convertFileName = requireName;
 	}
 
-	const filePath = path.join(fileRoot, converFileName);
+	const filePath = path.join(fileRoot, convertFileName);
 
 	if (fs.existsSync(filePath)) {
-		return [filePath, isLentStart];
+		return [filePath, isLentStart, isModulesFile];
 	}
-	return ['', isLentStart];
+	return ['', isLentStart, false];
 };
 
 export const findFile = (
 	requireName: string,
 	fileExit: Array<string>,
 	lentHttpInstance: LentHttpInstance
-): [string, boolean] => {
-	const [f, isLentModule] = isHaveFile(
+): [string, boolean, boolean] => {
+	const [f, isLentModule, isModulesFile] = isHaveFile(
 		requireName,
 		requireName,
 		lentHttpInstance
 	);
-	if (f) return [f, isLentModule];
+	if (f) return [f, isLentModule, isModulesFile];
 	for (const exitName of fileExit) {
 		const [f, isLentModule] = isHaveFile(
 			requireName + exitName,
@@ -70,10 +69,10 @@ export const findFile = (
 			lentHttpInstance
 		);
 		if (f) {
-			return [f, isLentModule];
+			return [f, isLentModule, isModulesFile];
 		}
 	}
-	return ['', isLentModule];
+	return ['', isLentModule, isModulesFile];
 };
 
 export const transform = (
@@ -86,13 +85,13 @@ export const transform = (
 	}
 
 	let fileData = '';
-	const [filePath, isLentModule] = findFile(
+	const [filePath, isLentModule, isModulesFile] = findFile(
 		requestFileName,
-		['.js', '.ts', '.css'],
+		lentHttpInstance.config.extensions,
 		lentHttpInstance
 	);
 
-	const filterplugins = plugins().filter((v) => {
+	const filterPlugins = plugins().filter((v) => {
 		if (requestFileName.endsWith(v.exit) || filePath.endsWith(v.exit)) {
 			return true;
 		} else if (
@@ -106,15 +105,16 @@ export const transform = (
 	if (filePath) {
 		fileData = fs.readFileSync(filePath).toString();
 	}
-	if (filterplugins.length) {
+	if (filterPlugins.length) {
 		const fileUrl = {
 			filePath,
 			requestUrl: requestFileName,
-			isLentModule: !isLentModule
+			isLentModule: isLentModule,
+			isModulesFile
 		};
 		//这里可以单独抽离为一个库
 		return plugins()
-			.filter((v) => v.enforce === 'post')
+			.filter((v) => v.enforce === 'pre')
 			.reduce(
 				(prev, next) =>
 					prev.then((value) =>
@@ -122,17 +122,28 @@ export const transform = (
 					),
 				Promise.resolve(fileData)
 			)
-			.then((fileSoruce) => {
-				return filterplugins.reduce(
+			.then((fileSource) => {
+				return filterPlugins.reduce(
 					(prev, next) =>
 						prev.then((value) =>
 							next.transform(value, fileUrl, lentHttpInstance)
 						),
-					Promise.resolve(fileSoruce)
+					Promise.resolve(fileSource)
 				);
 			})
+			.then((fileSource) => {
+				return plugins()
+					.filter((v) => v.enforce === 'post')
+					.reduce(
+						(prev, next) =>
+							prev.then((value) =>
+								next.transform(value, fileUrl, lentHttpInstance)
+							),
+						Promise.resolve(fileSource)
+					);
+			})
 			.catch((e) => {
-				console.log('[lent error]', e.message);
+				console.log('[lent error]', e);
 			});
 	}
 	return Promise.resolve(null);
