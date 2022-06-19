@@ -3,13 +3,18 @@ import { LentPlugin } from './preCompose';
 export const handleInjectClientPlugin: LentPlugin = (l) => {
 	l.plugin.addPlugins({
 		name: 'handleFileImportPlugin',
-		exits: ['.js', '.ts', '.css'],
+		enforce: 'post',
 		transform(v, file) {
-			if (file.requestUrl.includes('client')) return v;
-			return `import { createHotContext } from "/@lent/client";
+			if (
+				!file.isLentModule &&
+				['.js', '.ts', '.css'].some((v) => file.filePath.endsWith(v))
+			) {
+				return `import { createHotContext } from "/@lent/client";
             import.meta.hot = createHotContext('${file.requestUrl}');
             ${v};
            `;
+			}
+			return v;
 		}
 	});
 };
