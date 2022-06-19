@@ -22,13 +22,6 @@ export const sliceFileDotName = (str: string) => {
 	return str;
 };
 
-export const importFileHash = (importStr: string, hash: string) => {
-	const importStrsuffix = importStr.slice(importStr.length - 1);
-	const fileSliceAfter = importStr.slice(0, importStr.length - 1);
-	const isAddSymbol = importStrsuffix === "'" ? "'" : '"';
-	return `${fileSliceAfter}?t=${hash}${isAddSymbol}`;
-};
-
 export const isLentRequest = (str: string): [string, boolean] => {
 	if (str.startsWith('/@lent')) {
 		return [str.replace('/@lent', ''), true];

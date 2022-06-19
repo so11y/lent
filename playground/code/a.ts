@@ -1,11 +1,5 @@
 import { th } from './b';
 
-export const t = `hello a.ts >>> ${th}`;
+export const t = `12 a.ts >>> ${th}`;
 
-console.log('A file');
-
-if (import.meta.hot) {
-	import.meta.hot.accept(() => {
-		console.log('a update');
-	});
-}
+console.log('A f5632e');

@@ -8,11 +8,9 @@ export const handleFileWatchPlugin: LentPlugin = (l) => {
 		dependModule.etag = Date.now().toString();
 		if (isSend) {
 			const moduleParent = getDependsParent(requestUrl, l.depend);
-			console.log('sxsx', requestUrl, moduleParent);
 			if (moduleParent.length) {
 				setDependsAddHash([...moduleParent.slice(1), requestUrl], l.depend);
 			}
-			console.log('sxsx222', requestUrl, moduleParent);
 			l.socket.sendSocket({
 				hotModule: {
 					fileName: requestUrl,
