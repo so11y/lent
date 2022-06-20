@@ -2,6 +2,7 @@ import chokidar from 'chokidar';
 import Http from 'http';
 import { WebSocketServer } from 'ws';
 import { LentModuleDepends } from './depends';
+import { MiddlewareNext } from './middleware/middleware';
 
 export interface Router {
 	method: string;
@@ -70,8 +71,10 @@ export interface LentHttpInstance {
 		port?: number;
 		plugin?: (v: LentHttpInstance) => void;
 		extensions?: Array<string>;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		middle?: Array<(m: MiddlewareHttp) => Promise<any> | void>;
+		middle?: Array<
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			(m: MiddlewareHttp, next?: MiddlewareNext) => Promise<any> | void
+		>;
 	};
 }
 
