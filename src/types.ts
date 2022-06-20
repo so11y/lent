@@ -72,3 +72,13 @@ export interface LentHttpInstance {
 		extensions?: Array<string>;
 	};
 }
+
+export interface MiddlewareHttp {
+	lentInstance: LentHttpInstance;
+	http: {
+		req: Http.IncomingMessage;
+		res: Http.ServerResponse;
+	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	mate: Record<string, any>;
+}

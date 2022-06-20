@@ -1,9 +1,15 @@
 import Http from 'http';
 import path from 'path';
 import { Socket } from 'net';
-import { transform } from './handleFile';
-import { handleUrl } from './share';
-import { LentHttpInstance, Router as TypeRouter } from './types';
+import { ComposeLink } from './middleware/middleware';
+import {
+	LentHttpInstance,
+	MiddlewareHttp,
+	Router as TypeRouter
+} from './types';
+import etagMiddle from './middleware/etag';
+import routerMiddle from './middleware/router';
+import transformMiddle from './middleware/transform';
 const pkg = require(path.resolve(__dirname, `../package.json`));
 
 export const router = (): LentHttpInstance['router'] => {
@@ -35,54 +41,20 @@ export const createHttp = (
 					}
 				);
 			});
+
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const middleware = new ComposeLink<MiddlewareHttp>();
+			middleware.use(etagMiddle).use(routerMiddle).use(transformMiddle);
 			http
 				.on('request', (req, res) => {
-					const [requestFileName, isHot] = handleUrl(req.url);
-					const model = lentInstance.depend.getDepend(requestFileName);
-					if (
-						model &&
-						(req.headers['if-none-match'] === model.etag ||
-							model.isLentModule === true)
-					) {
-						res.statusCode = 304;
-						return res.end();
-					}
-
-					const item = lentInstance.router
-						.getRouters()
-						.find((v) => v.path === requestFileName);
-
-					const plugins = lentInstance.plugin;
-					if (item) {
-						const indexHtmlPlugin = plugins
-							.getPlugins()
-							.find((v) => v.name === 'indexHtmlAddClientPlugin');
-						if (indexHtmlPlugin && requestFileName === '/') {
-							return res.end(
-								indexHtmlPlugin.transform(item?.handler(req, res).toString(), {
-									filePath: 'index.html',
-									requestUrl: requestFileName,
-									isLentModule: true,
-									isModulesFile: false
-								})
-							);
-						}
-						return Promise.resolve(item?.handler(req, res)).then((v) =>
-							res.end(v)
-						);
-					}
-
-					transform(requestFileName, plugins.getPlugins, lentInstance).then(
-						(transformValue) => {
-							const fileValue = transformValue || '';
-							const etag = lentInstance.depend.getDepend(requestFileName)?.etag;
-							res.setHeader('content-Type', 'text/javascript');
-							if (etag) {
-								res.setHeader('Etag', etag);
-							}
-							res.end(fileValue);
-						}
-					);
+					middleware.run({
+						lentInstance,
+						http: {
+							req,
+							res
+						},
+						mate: {}
+					});
 				})
 				.listen(lentInstance.config.port, () => {
 					console.log(`lent v${pkg.version} dev server running at:`);
