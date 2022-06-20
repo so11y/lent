@@ -6,7 +6,7 @@ import { LentPlugin } from './preCompose';
 export const handleFileImportPlugin: LentPlugin = (l) => {
 	l.plugin.addPlugins({
 		name: 'handleFileImportPlugin',
-		exits: ['.js', '.ts', '.tsx'],
+		exits: ['.js', '.ts', '.tsx', '.mjs', '.mts'],
 		async transform(v, file, i) {
 			await init;
 			const [imports] = parse(v);

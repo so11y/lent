@@ -7,7 +7,9 @@ export const handleInjectClientPlugin: LentPlugin = (l) => {
 		transform(v, file) {
 			if (
 				!file.isLentModule &&
-				['.js', '.ts', '.css'].some((v) => file.filePath.endsWith(v))
+				['.js', '.ts', '.tsx', '.mjs', '.mts', '.css'].some((v) =>
+					file.filePath.endsWith(v)
+				)
 			) {
 				return `import { createHotContext } from "/@lent/client";
             import.meta.hot = createHotContext('${file.requestUrl}');

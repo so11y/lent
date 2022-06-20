@@ -118,46 +118,30 @@ export const transform = async (
 	if (filePath) {
 		fileData = fs.readFileSync(filePath).toString();
 	}
-	if (filterPlugins.length) {
-		const fileUrl = {
-			filePath,
-			requestUrl: requestFileName,
-			isLentModule: isLentModule,
-			isModulesFile
-		};
-		//这里可以单独抽离为一个库
-		return plugins()
-			.filter((v) => v.enforce === 'pre')
-			.reduce(
-				(prev, next) =>
-					prev.then((value) =>
-						next.transform(value, fileUrl, lentHttpInstance)
-					),
-				Promise.resolve(fileData)
-			)
-			.then((fileSource) => {
-				return filterPlugins.reduce(
-					(prev, next) =>
-						prev.then((value) =>
-							next.transform(value, fileUrl, lentHttpInstance)
-						),
-					Promise.resolve(fileSource)
-				);
-			})
-			.then((fileSource) => {
-				return plugins()
-					.filter((v) => v.enforce === 'post')
-					.reduce(
-						(prev, next) =>
-							prev.then((value) =>
-								next.transform(value, fileUrl, lentHttpInstance)
-							),
-						Promise.resolve(fileSource)
-					);
-			})
-			.catch((e) => {
-				console.log('[lent error]', e);
-			});
-	}
-	return Promise.resolve(null);
+	const fileUrl = {
+		filePath,
+		requestUrl: requestFileName,
+		isLentModule: isLentModule,
+		isModulesFile
+	};
+	const reduces = (prev: Promise<string>, next: TransformPlugin) => {
+		return prev.then((value) =>
+			next.transform(value, fileUrl, lentHttpInstance)
+		);
+	};
+	//这里可以单独抽离为一个库
+	return plugins()
+		.filter((v) => v.enforce === 'pre')
+		.reduce(reduces, Promise.resolve(fileData))
+		.then((fileSource) =>
+			filterPlugins.reduce(reduces, Promise.resolve(fileSource))
+		)
+		.then((fileSource) => {
+			return plugins()
+				.filter((v) => v.enforce === 'post')
+				.reduce(reduces, Promise.resolve(fileSource));
+		})
+		.catch((e) => {
+			console.log('[lent error]', e);
+		});
 };
