@@ -9,8 +9,8 @@ interface ExpectFn<T> {
 class ExpectLink<T = any> {
 	public expect: ExpectFn<T>;
 	public next: ExpectLink<T> | null;
-	running(value?: T) {
-		const next = async (value?: T) => {
+	running(value?) {
+		const next = async () => {
 			if (this.next) {
 				await this.next.running(value);
 			}
