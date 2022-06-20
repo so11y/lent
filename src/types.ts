@@ -71,6 +71,8 @@ export interface LentHttpInstance {
 		plugin?: (v: LentHttpInstance) => void;
 		extensions?: Array<string>;
 	};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	middle?: Array<(m: MiddlewareHttp) => Promise<any> | void>;
 }
 
 export interface MiddlewareHttp {

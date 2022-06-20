@@ -44,7 +44,9 @@ export const createHttp = (
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const middleware = new ComposeLink<MiddlewareHttp>();
-			middleware.use(etagMiddle).use(routerMiddle).use(transformMiddle);
+			middleware.use(etagMiddle).use(routerMiddle);
+			lentInstance.middle?.forEach((v) => middleware.use(v));
+			middleware.use(transformMiddle);
 			http
 				.on('request', (req, res) => {
 					middleware.run({
