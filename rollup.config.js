@@ -27,9 +27,9 @@ const replaces = () => {
 	});
 };
 
-export default [
-	{
-		input: './src/index.ts',
+const defineBuild = (options) => {
+	return {
+		input: options.input,
 		plugins: [
 			typeScriptPlugin({
 				check: false,
@@ -48,31 +48,21 @@ export default [
 		output: {
 			banner,
 			sourcemap: isDev,
-			file: './dist/index.js',
-			format: 'cjs'
+			file: options.file,
+			format: options.format
 		}
-	},
-	{
+	};
+};
+
+export default [
+	defineBuild({
+		input: './src/index.ts',
+		file: './dist/index.js',
+		format: 'cjs'
+	}),
+	defineBuild({
 		input: './src/client.ts',
-		plugins: [
-			typeScriptPlugin({
-				check: false,
-				tsconfig: path.resolve(__dirname, './tsconfig.json'),
-				tsconfigOverride: {
-					sourcemap: isDev
-				}
-			}),
-			replaces()
-		],
-		watch: {
-			include: 'src/client.ts',
-			exclude: 'node_modules/**'
-		},
-		output: {
-			banner,
-			file: './dist/client.js',
-			format: 'es',
-			sourcemap: isDev
-		}
-	}
+		file: './dist/client.js',
+		format: 'es'
+	})
 ];
