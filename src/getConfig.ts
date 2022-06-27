@@ -31,7 +31,8 @@ export const getConfig = (lentHttpInstance: LentHttpInstance) => {
 		}
 	};
 	if (fs.existsSync(configPath)) {
-		config = require(configPath).default;
+		const requireConfig = require(configPath);
+		config = requireConfig.default || requireConfig;
 	}
 	if (config.plugin) {
 		config.plugin(lentHttpInstance);
