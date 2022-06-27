@@ -5,35 +5,43 @@ import { transformSyncCode } from './plugins/handleNodeModulePlugin';
 
 export const getConfig = (lentHttpInstance: LentHttpInstance) => {
 	const cwd = process.cwd();
-	const configPath = path.join(cwd, '/lent.config.js');
+	const configPaths = [
+		path.join(cwd, '/lent.config.js'),
+		path.join(cwd, '/lent.config.ts')
+	];
+	const defineConfig = configPaths.find((configPath) =>
+		fs.existsSync(configPath)
+	);
 	let config: LentHttpInstance['config'] = {};
-	const defaultLoader = require.extensions['.js'];
-	require.extensions['.js'] = (module, requiredFileName) => {
-		if (requiredFileName === configPath) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			(module as any)._compile(
-				transformSyncCode(fs.readFileSync(configPath), [
-					[
-						'@babel/preset-env',
-						{
-							targets: {
-								node: 'current'
+	if (defineConfig) {
+		const extension = path.extname(defineConfig);
+		const defaultLoader = require.extensions[extension];
+		require.extensions[extension] = (module, requiredFileName) => {
+			if (requiredFileName === defineConfig) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				(module as any)._compile(
+					transformSyncCode(fs.readFileSync(defineConfig), [
+						[
+							'@babel/preset-env',
+							{
+								targets: {
+									node: 'current'
+								}
 							}
-						}
-					]
-				]),
-				requiredFileName
-			);
-		} else {
-			if (defaultLoader) {
-				defaultLoader(module, requiredFileName);
+						]
+					]),
+					requiredFileName
+				);
+			} else {
+				if (defaultLoader) {
+					defaultLoader(module, requiredFileName);
+				}
 			}
-		}
-	};
-	if (fs.existsSync(configPath)) {
-		const requireConfig = require(configPath);
+		};
+		const requireConfig = require(defineConfig);
 		config = requireConfig.default || requireConfig;
 	}
+
 	if (config.plugin) {
 		config.plugin(lentHttpInstance);
 	}
