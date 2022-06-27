@@ -14,6 +14,9 @@ export default (middlewareHttp: MiddlewareHttp, next: MiddlewareNext) => {
 		http.res.statusCode = 304;
 		return http.res.end();
 	}
+	if (requestFileName.endsWith('.map')) {
+		return http.res.end();
+	}
 	middlewareHttp.mate.requestFileName = requestFileName;
 	next();
 };

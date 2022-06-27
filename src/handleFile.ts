@@ -93,10 +93,6 @@ export const transform = async (
 	plugins: () => Array<TransformPlugin>,
 	lentHttpInstance: LentHttpInstance
 ) => {
-	if (requestFileName.endsWith('.map')) {
-		return Promise.resolve(null);
-	}
-
 	let fileData = '';
 	const [filePath, isLentModule, isModulesFile] = await findFile(
 		requestFileName,
