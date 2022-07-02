@@ -3,5 +3,5 @@ interface ImportMeta {
 		accept: (callback: (...arg: []) => unknown) => void;
 	};
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	gold(path: string): Array<Record<string, () => Promise<any>>>;
+	glob(path: string): Array<Record<string, () => Promise<any>>>;
 }

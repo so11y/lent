@@ -9,7 +9,7 @@ import { handleCreateLentFileModulePlugin } from './handleCreateLentFileModulePl
 import { handleInjectClientPlugin } from './handleInjectClientPlugin';
 import { handleNodeModulePlugin } from './handleNodeModulePlugin';
 import { handleEnvPlugin } from './handleEnvPlugin';
-import { handleGoldPlugin } from './handleGoldPlugin';
+import { handleGlobPlugin } from './handleGlobPlugin';
 
 export type LentPlugin = (l: LentHttpInstance) => void;
 
@@ -36,7 +36,7 @@ export const preCompose = (): Array<LentPlugin> => {
 		handleNodeModulePlugin,
 		handleInjectClientPlugin,
 		handleSocketPortPlugin,
-		handleGoldPlugin,
+		handleGlobPlugin,
 		handleEnvPlugin
 	];
 };

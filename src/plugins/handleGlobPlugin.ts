@@ -3,9 +3,9 @@ import { glob } from 'glob';
 import { LentPlugin } from './preCompose';
 import MagicString from 'magic-string';
 
-export const handleGoldPlugin: LentPlugin = (l) => {
+export const handleGlobPlugin: LentPlugin = (l) => {
 	l.plugin.addPlugins({
-		name: 'handleGoldPlugin',
+		name: 'handleGlobPlugin',
 		exits: ['.js', '.ts', '.tsx', '.mjs', '.mts'],
 		transform(v, file, i) {
 			if (v) {
