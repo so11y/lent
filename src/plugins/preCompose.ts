@@ -33,11 +33,11 @@ export const preCompose = (): Array<LentPlugin> => {
 		handleFileImportPlugin,
 		handleCreateLentFileModulePlugin,
 		handleFileWatchPlugin,
-		handleNodeModulePlugin,
 		handleInjectClientPlugin,
 		handleSocketPortPlugin,
 		handleGlobPlugin,
-		handleEnvPlugin
+		handleEnvPlugin,
+		handleNodeModulePlugin
 	];
 };
 

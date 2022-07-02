@@ -20,16 +20,18 @@ export const getConfig = (lentHttpInstance: LentHttpInstance) => {
 			if (requiredFileName === defineConfig) {
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				(module as any)._compile(
-					transformSyncCode(fs.readFileSync(defineConfig), [
-						[
-							'@babel/preset-env',
-							{
-								targets: {
-									node: 'current'
+					transformSyncCode(fs.readFileSync(defineConfig), {
+						presets: [
+							[
+								'@babel/preset-env',
+								{
+									targets: {
+										node: 'current'
+									}
 								}
-							}
+							]
 						]
-					]),
+					}),
 					requiredFileName
 				);
 			} else {
