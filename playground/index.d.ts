@@ -1,5 +1,1 @@
-interface ImportMeta {
-	hot: {
-		accept: (callback: (...arg: []) => unknown) => void;
-	};
-}
+/// <reference types="../importMeta" />

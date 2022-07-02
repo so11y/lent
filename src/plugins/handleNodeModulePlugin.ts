@@ -3,7 +3,7 @@ import { transformSync } from '@babel/core';
 
 export const transformSyncCode = (code, otherPresets = []) => {
 	return transformSync(code, {
-		sourceMaps: 'inline',
+		// sourceMaps: 'inline',
 		presets: [['babel-preset-typescript'], ...otherPresets]
 	}).code;
 };
