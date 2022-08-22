@@ -11,10 +11,11 @@ export const handleInjectClientPlugin: LentPlugin = (l) => {
 					file.filePath.endsWith(v)
 				)
 			) {
-				return `import { createHotContext } from "/@lent/client";
-            import.meta.hot = createHotContext('${file.requestUrl}');
-            ${v};
-           `;
+				return `
+						import { createHotContext } from "/@lent/client";
+						import.meta.hot = createHotContext('${file.requestUrl}');
+						${v}
+						`;
 			}
 			return v;
 		}

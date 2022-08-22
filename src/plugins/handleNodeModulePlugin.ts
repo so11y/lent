@@ -1,9 +1,15 @@
 import { LentPlugin } from './preCompose';
 import { transformSync } from '@babel/core';
+import path from 'path';
 
-export const transformSyncCode = (code, otherPresets = []) => {
+export const transformSyncCode = (
+	code,
+	otherPresets = [],
+	sourceFileName = ''
+) => {
 	return transformSync(code, {
-		// sourceMaps: 'inline',
+		sourceMaps: 'inline',
+		sourceFileName,
 		presets: [['babel-preset-typescript'], ...otherPresets]
 	}).code;
 };
@@ -16,11 +22,7 @@ export const handleNodeModulePlugin: LentPlugin = (l) => {
 			if (file.isLentModule && file.isModulesFile) {
 				return v;
 			}
-			if (!file.isLentModule || file.requestUrl.endsWith('.ts')) {
-				return transformSyncCode(v);
-			}
-
-			return v;
+			return transformSyncCode(v, [], path.join(process.cwd(), file.filePath));
 		}
 	});
 };

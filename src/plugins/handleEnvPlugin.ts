@@ -10,14 +10,7 @@ export const handleEnvPlugin: LentPlugin = (l) => {
 					file.filePath.endsWith(v)
 				)
 			) {
-				return `
-                var process = {
-                    env:{
-                        NODE_ENV:'development'
-                    }
-                }
-                ${v}
-                `;
+				return `var process = {env:{NODE_ENV:'development'}};${v}`;
 			}
 			return v;
 		}
