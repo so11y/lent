@@ -1,4 +1,5 @@
 import { LentPlugin } from './preCompose';
+import magicString from 'magic-string';
 
 export const handleInjectClientPlugin: LentPlugin = (l) => {
 	l.plugin.addPlugins({
@@ -11,11 +12,12 @@ export const handleInjectClientPlugin: LentPlugin = (l) => {
 					file.filePath.endsWith(v)
 				)
 			) {
-				return `
-						import { createHotContext } from "/@lent/client";
-						import.meta.hot = createHotContext('${file.requestUrl}');
-						${v}
-						`;
+				const ms = new magicString(v);
+				ms.prepend(
+					`import { createHotContext } from "/@lent/client";import.meta.hot = createHotContext('${file.requestUrl}');`
+				);
+				ms.prepend("var process = {env:{NODE_ENV:'development'}};");
+				return ms.toString();
 			}
 			return v;
 		}

@@ -50,7 +50,7 @@
         "email": "247076126@qq.com"
     },
     "name": "lent",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "description": "lent",
     "main": "dist/index.js",
     "license": "ISC"
