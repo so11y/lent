@@ -8,8 +8,9 @@ export default (middlewareHttp: MiddlewareHttp, next: MiddlewareNext) => {
 	const model = lentInstance.depend.getDepend(requestFileName);
 	if (
 		model &&
-		(http.req.headers['if-none-match'] === model.etag ||
-			model.isLentModule === true)
+		http.req.headers['if-none-match'] === model.etag
+		//  ||
+		// 	model.isLentModule === true
 	) {
 		http.res.statusCode = 304;
 		return http.res.end();

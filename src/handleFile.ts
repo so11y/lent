@@ -2,23 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { LentHttpInstance, TransformPlugin } from './types';
 import { isLentRequest } from './share';
-import resolveId from 'resolve';
-
-const findPackage = (moduleName) => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return new Promise<Record<string, any>>((r) => {
-		resolveId(
-			moduleName,
-			{
-				packageFilter(packages) {
-					r(packages);
-				}
-			},
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			() => {}
-		);
-	});
-};
+import { getPackageInfo } from 'local-pkg';
 
 const whiteNames = ['client'];
 
@@ -40,9 +24,10 @@ export const isHaveFile = async (
 	} else if (isLentStart) {
 		fileRoot = process.cwd();
 		try {
-			const filePackage = await findPackage(convertFileName);
-			const fileRoot = filePackage.module || filePackage.main;
-			if (filePackage.module) {
+			const filePackage = await getPackageInfo(convertFileName);
+			const fileRoot =
+				filePackage.packageJson.module || filePackage.packageJson.main;
+			if (filePackage.packageJson.module) {
 				isModulesFile = true;
 			}
 			convertFileName = path.join('/node_modules', convertFileName, fileRoot);
