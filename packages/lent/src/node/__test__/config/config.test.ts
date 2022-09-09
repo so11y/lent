@@ -14,7 +14,7 @@ test('test have config file', async () => {
 	`);
 });
 
-test('test less config file', async () => {
+test('test miss config file', async () => {
 	const config = await resolveConfig({
 		configDir: join(__dirname)
 	});
@@ -22,6 +22,19 @@ test('test less config file', async () => {
 		{
 		  "port": 3000,
 		  "root": "/",
+		}
+	`);
+});
+
+test('test inline config', async () => {
+	const config = await resolveConfig({
+		root: '/fake',
+		port: 7999
+	});
+	expect(config).toMatchInlineSnapshot(`
+		{
+		  "port": 7999,
+		  "root": "/fake",
 		}
 	`);
 });

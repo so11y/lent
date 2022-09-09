@@ -67,9 +67,15 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 	return lentConfig;
 };
 
-export const resolveConfig = async (
+export async function resolveConfig(
+	inlineConfig?: Pick<userConfig, 'configDir'>
+): Promise<LentConfig>;
+export async function resolveConfig(
+	inlineConfig?: Omit<userConfig, 'configDir'>
+): Promise<LentConfig>;
+export async function resolveConfig(
 	inlineConfig?: userConfig
-): Promise<LentConfig> => {
+): Promise<LentConfig> {
 	let config: userConfig | undefined = inlineConfig;
 	const configDir = config?.configDir || process.cwd();
 	const configPath = findFile(lentConfigFiles, configDir);
@@ -78,4 +84,4 @@ export const resolveConfig = async (
 		config = runConfigFile(configPath, code).default;
 	}
 	return mergeConfig(config);
-};
+}
