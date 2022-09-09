@@ -1,15 +1,15 @@
 import { LentConfig, userConfig } from '../../types/config';
 import { findFile } from '../utils';
 import { build } from 'esbuild';
-import { extname } from 'path';
+import { extname, isAbsolute } from 'path';
 
 const LENTCONFIGFILENAME = 'lent.config';
 
-const runConfigFile = (filePath: string, code: string) => {
-	const extension = extname(filePath);
+const runConfigFile = (resolvedPath: string, code: string) => {
+	const extension = extname(resolvedPath);
 	const defaultLoader = require.extensions[extension];
 	require.extensions[extension] = (module, requiredFileName) => {
-		if (requiredFileName === filePath) {
+		if (requiredFileName === resolvedPath) {
 			(module as any)._compile(code, requiredFileName);
 		} else {
 			if (defaultLoader) {
@@ -17,7 +17,8 @@ const runConfigFile = (filePath: string, code: string) => {
 			}
 		}
 	};
-	return require(filePath);
+	delete require.cache[require.resolve(resolvedPath)];
+	return require(resolvedPath);
 };
 
 async function bundleConfigFile(
@@ -32,7 +33,22 @@ async function bundleConfigFile(
 		bundle: true,
 		format: 'cjs',
 		sourcemap: 'inline',
-		metafile: true
+		metafile: true,
+		plugins: [
+			{
+				name: 'externalize-deps',
+				setup(build) {
+					build.onResolve({ filter: /.*/ }, (args) => {
+						const id = args.path;
+						if (id[0] !== '.' && !isAbsolute(id)) {
+							return {
+								external: true
+							};
+						}
+					});
+				}
+			}
+		]
 	});
 	const { text } = result.outputFiles[0];
 	return text;
