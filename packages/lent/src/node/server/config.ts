@@ -1,7 +1,8 @@
 import { LentConfig, userConfig } from '../../types/config';
 import { findFile } from '../utils';
 import { build } from 'esbuild';
-import { extname, isAbsolute } from 'path';
+import { existsSync } from 'node:fs';
+import { extname, isAbsolute, dirname, basename } from 'node:path';
 
 const lentConfigFileName = 'lent.config';
 const lentConfigFiles = [
@@ -61,6 +62,7 @@ async function bundleConfigFile(
 
 const mergeConfig = (config?: userConfig): LentConfig => {
 	const lentConfig: LentConfig = {
+		userConfig: config || null,
 		port: config?.port || 3000,
 		root: config?.root || '/'
 	};
@@ -68,19 +70,22 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 };
 
 export async function resolveConfig(
-	inlineConfig?: Pick<userConfig, 'configDir'>
+	inlineConfig?: Pick<userConfig, 'configPath'>
 ): Promise<LentConfig>;
 export async function resolveConfig(
-	inlineConfig?: Omit<userConfig, 'configDir'>
+	inlineConfig?: Omit<userConfig, 'configPath'>
 ): Promise<LentConfig>;
 export async function resolveConfig(
 	inlineConfig?: userConfig
 ): Promise<LentConfig> {
 	let config: userConfig | undefined = inlineConfig;
-	const configDir = config?.configDir || process.cwd();
-	const configPath = findFile(lentConfigFiles, configDir);
-	if (configPath) {
-		const code = await bundleConfigFile(configPath, configDir);
+	const configPath =
+		config?.configPath || findFile(lentConfigFiles, process.cwd());
+
+	if (configPath && existsSync(configPath)) {
+		const dir = dirname(configPath);
+		const fileName = basename(configPath);
+		const code = await bundleConfigFile(fileName, dir);
 		config = runConfigFile(configPath, code).default;
 	}
 	return mergeConfig(config);
