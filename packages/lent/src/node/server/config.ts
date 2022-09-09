@@ -3,7 +3,12 @@ import { findFile } from '../utils';
 import { build } from 'esbuild';
 import { extname, isAbsolute } from 'path';
 
-const LENTCONFIGFILENAME = 'lent.config';
+const lentConfigFileName = 'lent.config';
+const lentConfigFiles = [
+	`${lentConfigFileName}.ts`,
+	`${lentConfigFileName}.js`,
+	`${lentConfigFileName}.mjs`
+];
 
 const runConfigFile = (resolvedPath: string, code: string) => {
 	const extension = extname(resolvedPath);
@@ -67,11 +72,6 @@ export const resolveConfig = async (
 ): Promise<LentConfig> => {
 	let config: userConfig | undefined = inlineConfig;
 	const configDir = config?.configDir || process.cwd();
-	const lentConfigFiles = [
-		`${LENTCONFIGFILENAME}.ts`,
-		`${LENTCONFIGFILENAME}.js`,
-		`${LENTCONFIGFILENAME}.mjs`
-	];
 	const configPath = findFile(lentConfigFiles, configDir);
 	if (configPath) {
 		const code = await bundleConfigFile(configPath, configDir);
