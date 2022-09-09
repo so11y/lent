@@ -23,10 +23,10 @@ const runConfigFile = (resolvedPath: string, code: string) => {
 
 async function bundleConfigFile(
 	fileName: string,
-	root: string
+	absWorkingDir: string
 ): Promise<string> {
 	const result = await build({
-		absWorkingDir: root,
+		absWorkingDir,
 		entryPoints: [fileName],
 		write: false,
 		platform: 'node',
