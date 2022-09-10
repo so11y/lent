@@ -163,7 +163,8 @@ export const createPluginContainer = async (
 
 			let id: string | null = null;
 			const partial: any = {};
-			for (const plugin of plugins) {
+			const plugins_ = sortUserPlugins(plugins);
+			for (const plugin of plugins_) {
 				if (!plugin.resolveId) continue;
 				if (skips?.has(plugin)) continue;
 

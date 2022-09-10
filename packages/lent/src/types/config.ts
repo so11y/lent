@@ -9,11 +9,12 @@ export interface userConfig {
 	build?: {
 		rollupOptions?: RollupOptions;
 	};
+	extensions?: Array<string>;
 }
 
 export type LentConfig = Required<
-	Pick<userConfig, 'root' | 'port' | 'build' | 'plugins'>
->
+	Pick<userConfig, 'root' | 'port' | 'build' | 'plugins' | 'extensions'>
+>;
 // & {
 // 	userConfig: userConfig | null;
 // };

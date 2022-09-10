@@ -10,10 +10,10 @@ export class ModuleNode {
 	type: 'js' | 'css';
 	importers = new Set<ModuleNode>();
 	importedModules = new Set<ModuleNode>();
-	// acceptedHmrDeps = new Set<ModuleNode>()
-	lastHMRTimestamp = 0;
+	// lastHMRTimestamp = 0;
+	etag?: string;
 
-	constructor(url: string) {
+	constructor(url: string,) {
 		this.url = url;
 		this.type = url.endsWith('.css') ? 'css' : 'js';
 	}

@@ -66,6 +66,15 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 		port: config?.port || 3000,
 		root: join(process.cwd(), config?.root || '/'),
 		plugins: [...resolvePlugins()],
+		extensions: [
+			'.mjs',
+			'.js',
+			'.ts',
+			'.jsx',
+			'.tsx',
+			'.json',
+			...(config?.extensions || [])
+		],
 		build: {}
 	};
 	return lentConfig;

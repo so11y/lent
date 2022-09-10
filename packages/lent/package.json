@@ -16,6 +16,7 @@
 		"@rollup/plugin-replace": "^4.0.0",
 		"@rollup/pluginutils": "^4.2.1",
 		"@types/cheerio": "^0.22.31",
+		"@types/etag": "^1.8.1",
 		"@types/ws": "^8.5.3",
 		"local-pkg": "^0.4.2",
 		"rollup": "^2.79.0",

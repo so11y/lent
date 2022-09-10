@@ -9,6 +9,7 @@ export function esbuildPlugin(): Plugin {
 
 	return {
 		name: 'lent:esbuild',
+		enforce:"post",
 		async transform(code, id) {
 			if (filter(id) || filter(cleanUrl(id))) {
 				const loader = `.${extname(id)!}` as Loader;

@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "pnpm -F @lent/lent run dev",
+		"dev": "pnpm -F lent run dev",
 		"playground":"pnpm -F @lent/playground dev"
 	},
 	"devDependencies": {

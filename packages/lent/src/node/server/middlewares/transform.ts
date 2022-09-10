@@ -1,30 +1,21 @@
 import http from 'http';
 import { Lent } from '../index';
-import { join, resolve } from 'path';
-import { readFileSync } from 'fs';
-import { sortUserPlugins, cleanInternalUrl } from '../../utils';
-import { getPackageInfo } from 'local-pkg';
+import { handleInternal } from '../../utils';
+import { doTransform } from '../transformRequest';
+import { send } from '../send';
 
-const whites = ['client'];
-const handleInternal = (url: string): [string, boolean] => {
-	const url_ = cleanInternalUrl(url);
-	if (url.startsWith('/@lent/') && whites.includes(url_)) {
-		const filePath = resolve(resolve('lent'), `./dist/${url}.js`);
-		return [filePath, true];
-	}
-	return [url, false];
-};
+export const transform = (lent: Lent) => {
+	return async (req: http.IncomingMessage, res: http.ServerResponse) => {
+		let [url, isInternal] = handleInternal(req.url!);
+		const mod = await lent.moduleGraph.getModuleByUrl(url);
 
-export const doTransform = (lent: Lent) => {
-	return async (
-		req: http.IncomingMessage,
-		res: http.ServerResponse,
-		next: Function
-	) => {
-		const [url, isInternal] = handleInternal(req.url!);
-		let path = url;
-		if (!isInternal) {
-
+		const ifNoneMatch = req.headers['if-none-match'];
+		if (ifNoneMatch && mod?.etag === ifNoneMatch) {
+			res.statusCode = 304;
+			return res.end();
 		}
+
+		const { code, mod: transformMod } = await doTransform(req.url!, lent);
+		send(req, res, code, transformMod.type, transformMod.etag);
 	};
 };
