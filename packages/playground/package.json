@@ -5,8 +5,5 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "lent"
-	},
-	"devDependencies": {
-		"@lent/lent": "workspace:*"
 	}
 }

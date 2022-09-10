@@ -31,6 +31,5 @@ export interface Plugin extends RollupPlugin {
 		code: string,
 		id: string,
 		ssr?: boolean
-	): TransformResult;
+	): Promise<TransformResult> | TransformResult;
 }
-

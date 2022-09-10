@@ -3,7 +3,7 @@ import cheerio from 'cheerio';
 
 export const htmlPlugin = (): Plugin => {
 	return {
-		name: 'htmlPlugin',
+		name: 'lent:htmlPlugin',
 		enforce: 'post',
 		transformIndexHtml(html) {
 			const select = cheerio.load(html);

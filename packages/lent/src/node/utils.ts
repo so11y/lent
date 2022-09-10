@@ -3,6 +3,12 @@ import path from 'node:path';
 import os from 'os';
 import { Plugin } from '../types/plugin';
 
+const queryRE = /\?.*$/s;
+const hashRE = /#.*$/s;
+const importQueryRE = /(\?|&)import=?(?:&|$)/;
+const trailingSeparatorRE = /[\?&]$/;
+const timestampRE = /\bt=\d{13}&?\b/;
+
 export function slash(p: string): string {
 	return p.replace(/\\/g, '/');
 }
@@ -35,4 +41,19 @@ export function sortUserPlugins(plugins: Plugin[]): Plugin[] {
 	});
 
 	return [...prePlugins, ...normalPlugins, ...postPlugins];
+}
+
+export const cleanInternalUrl = (url: string): string => {
+	return url.replace('/@lent/', '');
+};
+
+export const cleanUrl = (url: string): string =>
+	url.replace(hashRE, '').replace(queryRE, '');
+
+export function removeImportQuery(url: string): string {
+	return url.replace(importQueryRE, '$1').replace(trailingSeparatorRE, '');
+}
+
+export function removeTimestampQuery(url: string): string {
+	return url.replace(timestampRE, '').replace(trailingSeparatorRE, '');
 }

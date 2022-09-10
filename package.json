@@ -9,7 +9,7 @@
 	},
 	"devDependencies": {
 		"@lent/link": "workspace:*",
-		"@lent/lent": "workspace:*"
+		"lent": "workspace:*"
 	},
 	"dependencies": {
 		"vitest": "^0.23.1"
