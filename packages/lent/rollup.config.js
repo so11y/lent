@@ -46,7 +46,7 @@ const defineBuild = (options) => {
 		// external: Object.keys(pkg.dependencies),
 		output: {
 			banner,
-			sourcemap: isDev,
+			sourcemap: 'inline',
 			file: options.file,
 			format: options.format
 		}

@@ -3,6 +3,7 @@
     "esbuild",
     "LENTCONFIGFILENAME",
     "metafile",
+    "middlewares",
     "pluginutils"
   ]
 }

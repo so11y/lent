@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import os from 'os';
 import { Plugin } from '../types/plugin';
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 const queryRE = /\?.*$/s;
 const hashRE = /#.*$/s;
 const importQueryRE = /(\?|&)import=?(?:&|$)/;
@@ -70,11 +70,9 @@ export function getMaybeValue(source: any, key: string, defaultValue?: any) {
 
 const whites = ['client'];
 export const handleInternal = (url: string): [string, boolean] => {
-	let url_ = cleanInternalUrl(url);
 	let isInternal = false;
-	if (url.startsWith('/@lent/') && whites.includes(url_)) {
-		url_ = resolve(resolve('lent'), `./dist/${url_}.js`);
+	if (url.startsWith('/@lent/') && whites.includes(cleanInternalUrl(url))) {
 		isInternal = true;
 	}
-	return [removeTimestampQuery(removeImportQuery(url_)), false];
+	return [removeTimestampQuery(removeImportQuery(url)), isInternal];
 };

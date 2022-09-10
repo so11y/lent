@@ -5,20 +5,24 @@ import { getPackageInfo } from 'local-pkg';
 // import { ensureWatchedFile } from './watcher';
 
 export const doTransform = async (rawUrl: string, lent: Lent) => {
-	let [url, isInternal] = handleInternal(rawUrl);
-	let path: string = url;
+	const [url] = handleInternal(rawUrl);
 
-	if (!isInternal) {
-		path = getMaybeValue(await lent.pluginContainer.resolveId(url), 'id', url);
-	}
+	const filePath: string = await getMaybeValue(
+		await lent.pluginContainer.resolveId(url),
+		'id',
+		url
+	);
 
-	let loadResult = getMaybeValue(await lent.pluginContainer.load(path), 'code');
+	const loadResult = getMaybeValue(
+		await lent.pluginContainer.load(filePath),
+		'code'
+	);
 
 	if (loadResult === null) {
 		throw new Error(`[lent error] loadResult null ${url}`);
 	}
 	const code = getMaybeValue(
-		await lent.pluginContainer.transform(loadResult, url),
+		await lent.pluginContainer.transform(loadResult, filePath),
 		'code'
 	);
 

@@ -3,10 +3,11 @@ import { resolve } from 'path';
 import { existsSync } from 'fs';
 import { Plugin } from '../../../types/plugin';
 import { Lent } from '../index';
+import { cleanInternalUrl, handleInternal } from '../../../node/utils';
 
 export const tryFsResolve = (fsPath: string, exits: Array<string>) => {
-	if(existsSync(fsPath)){
-		return fsPath
+	if (existsSync(fsPath)) {
+		return fsPath;
 	}
 	return exits
 		.map((exit) => `$${fsPath}${exit}`)
@@ -23,6 +24,13 @@ export const resolvePlugin = (): Plugin => {
 		},
 		resolveId(id: string) {
 			let res: string | PartialResolvedId | undefined;
+			const [url, isInternal] = handleInternal(id);
+			if (isInternal) {
+				return resolve(
+					require.resolve('lent'),
+					`../${cleanInternalUrl(url)}.js`
+				);
+			}
 			const fsPath = resolve(lent.config.root, id.slice(1));
 			if ((res = tryFsResolve(fsPath, lent.config.extensions))) {
 				return res;

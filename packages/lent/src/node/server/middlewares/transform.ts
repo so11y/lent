@@ -6,12 +6,15 @@ import { send } from '../send';
 
 export const transform = (lent: Lent) => {
 	return async (req: http.IncomingMessage, res: http.ServerResponse) => {
-		let [url, isInternal] = handleInternal(req.url!);
+		const [url] = handleInternal(req.url!);
 		const mod = await lent.moduleGraph.getModuleByUrl(url);
 
 		const ifNoneMatch = req.headers['if-none-match'];
 		if (ifNoneMatch && mod?.etag === ifNoneMatch) {
 			res.statusCode = 304;
+			return res.end();
+		}
+		if(url.endsWith(".map")){
 			return res.end();
 		}
 
