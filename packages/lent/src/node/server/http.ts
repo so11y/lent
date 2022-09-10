@@ -8,6 +8,7 @@ const pkg = require(resolve(__dirname, `../package.json`));
 
 export function httpServer(lentConfig: LentConfig, lent: Lent) {
 	let { port } = lentConfig;
+
 	const middleware = new ComposeLink<
 		[http.IncomingMessage, http.ServerResponse]
 	>();

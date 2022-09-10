@@ -1,20 +1,38 @@
 import { LentConfig } from '../../types/config';
 import { PluginContext, Plugin } from '../../types/plugin';
 import * as acorn from 'acorn';
-import { ResolvedId } from 'rollup';
+import {
+	InputOptions,
+	LoadResult,
+	PartialResolvedId,
+	ResolvedId,
+	SourceDescription,
+	TransformResult
+} from 'rollup';
 import { FSWatcher } from 'chokidar';
 import { ensureWatchedFile } from './watcher';
-import {join} from "path"
-import { isObject, normalizePath } from '../utils';
+import { join } from 'path';
+import { isObject, normalizePath, sortUserPlugins } from '../utils';
 
-export const createPluginContainer = async ({
-	plugins,
-  root,
-	build: { rollupOptions }
-}: LentConfig,watcher?: FSWatcher) => {
+export interface PluginContainer {
+	options: InputOptions;
+	buildStart(options: InputOptions): Promise<void>;
+	resolveId(
+		id: string,
+		importer?: string,
+		skip?: Set<Plugin>
+	): Promise<PartialResolvedId | null>;
+	transform(code: string, id: string): Promise<SourceDescription | null>;
+	load(id: string): Promise<LoadResult | null>;
+	close(): Promise<void>;
+}
 
-  const MODULES = new Map()
-  const watchFiles = new Set<string>()
+export const createPluginContainer = async (
+	{ plugins, root, build: { rollupOptions } }: LentConfig,
+	watcher?: FSWatcher
+): Promise<PluginContainer> => {
+	const MODULES = new Map();
+	const watchFiles = new Set<string>();
 
 	class Context implements PluginContext {
 		meta = {};
@@ -56,8 +74,6 @@ export const createPluginContainer = async ({
 			let mod = MODULES.get(id);
 			if (mod) return mod.info;
 			mod = {
-				/** @type {import('rollup').ModuleInfo} */
-				// @ts-ignore-next
 				info: {}
 			};
 			MODULES.set(id, mod);
@@ -92,35 +108,31 @@ export const createPluginContainer = async ({
 			return '';
 		}
 
-		warn(
-			e: string ,
-		) {
-      console.warn(`warn`, e);
+		warn(e: string) {
+			console.warn(`warn`, e);
 		}
 
-		error(
-			e: string,
-		) {
+		error(e: string) {
 			console.error(`error`, e);
 		}
 	}
-  class TransformContext extends Context {
-    filename: string
-    originalCode: string
+	class TransformContext extends Context {
+		filename: string;
+		originalCode: string;
 
-    constructor(filename: string, code: string) {
-      super()
-      this.filename = filename
-      this.originalCode = code
-    }
-  }
+		constructor(filename: string, code: string) {
+			super();
+			this.filename = filename;
+			this.originalCode = code;
+		}
+	}
 
 	const container = {
 		options: await (async () => {
 			let options = rollupOptions;
 			for (const plugin of plugins) {
 				if (!plugin.options) continue;
-				options = (await plugin.options.call({}, options)) || options;
+				options = (await (plugin.options as any).call({}, options)) || options;
 			}
 			return {
 				acorn,
@@ -132,7 +144,7 @@ export const createPluginContainer = async ({
 			await Promise.all(
 				plugins.map((plugin) => {
 					if (plugin.buildStart) {
-						return plugin.buildStart.call(
+						return (plugin.buildStart as any).call(
 							new Context(plugin) as any,
 							container.options
 						);
@@ -141,23 +153,22 @@ export const createPluginContainer = async ({
 			);
 		},
 
-		async resolveId(rawId:string, importer = join(root, 'index.html'), skips:any) {
+		async resolveId(
+			rawId: string,
+			importer = join(root, 'index.html'),
+			skips: any
+		) {
 			const ctx = new Context();
 			ctx._resolveSkips = skips;
 
 			let id: string | null = null;
-			const partial:any= {};
+			const partial: any = {};
 			for (const plugin of plugins) {
 				if (!plugin.resolveId) continue;
 				if (skips?.has(plugin)) continue;
 
 				ctx._activePlugin = plugin;
-				const result = await plugin.resolveId.call(
-					ctx as any,
-					rawId,
-					importer,
-					{},
-				);
+				const result = await plugin.resolveId.call(ctx, rawId, importer, {});
 				if (!result) continue;
 
 				if (typeof result === 'string') {
@@ -171,13 +182,13 @@ export const createPluginContainer = async ({
 
 			if (id) {
 				partial.id = normalizePath(id);
-				return partial ;
+				return partial;
 			} else {
 				return null;
 			}
 		},
 
-		async load(id:string) {
+		async load(id: string) {
 			const ctx = new Context();
 			for (const plugin of plugins) {
 				if (!plugin.load) continue;
@@ -190,14 +201,15 @@ export const createPluginContainer = async ({
 			return null;
 		},
 
-		async transform(code:string, id:string) {
+		async transform(code: string, id: string) {
 			const ctx = new TransformContext(id, code);
-			for (const plugin of plugins) {
+			const plugins_ = sortUserPlugins(plugins);
+			for (const plugin of plugins_) {
 				if (!plugin.transform) continue;
 				ctx._activePlugin = plugin;
 				ctx._activeId = id;
 				ctx._activeCode = code;
-				let result: string | undefined;
+				let result: TransformResult;
 				try {
 					result = await plugin.transform.call(ctx as any, code, id);
 				} catch (e) {
@@ -211,7 +223,7 @@ export const createPluginContainer = async ({
 				}
 			}
 			return {
-				code,
+				code
 			};
 		},
 
@@ -219,10 +231,12 @@ export const createPluginContainer = async ({
 			if (closed) return;
 			const ctx = new Context();
 			await Promise.all(
-				plugins.map((p) => p.buildEnd && p.buildEnd.call(ctx as any))
+				plugins.map((p) => p.buildEnd && (p.buildEnd as any).call(ctx as any))
 			);
 			await Promise.all(
-				plugins.map((p) => p.closeBundle && p.closeBundle.call(ctx as any))
+				plugins.map(
+					(p) => p.closeBundle && (p.closeBundle as any).call(ctx as any)
+				)
 			);
 			closed = true;
 		}

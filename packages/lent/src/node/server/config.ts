@@ -3,6 +3,7 @@ import { findFile } from '../utils';
 import { build } from 'esbuild';
 import { existsSync } from 'node:fs';
 import { extname, isAbsolute, dirname, basename, join } from 'node:path';
+import { resolvePlugins } from './plugin/index';
 
 const lentConfigFileName = 'lent.config';
 const lentConfigFiles = [
@@ -62,10 +63,9 @@ async function bundleConfigFile(
 
 const mergeConfig = (config?: userConfig): LentConfig => {
 	const lentConfig: LentConfig = {
-		userConfig: config || null,
 		port: config?.port || 3000,
 		root: join(process.cwd(), config?.root || '/'),
-		plugins: [],
+		plugins: [...resolvePlugins()],
 		build: {}
 	};
 	return lentConfig;

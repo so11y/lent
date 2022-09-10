@@ -26,27 +26,42 @@ const replaces = () => {
 	});
 };
 
-export default {
-	input: './src/node/server/index.ts',
-	plugins: [
-		typeScriptPlugin({
-			check: false,
-			tsconfig: path.resolve(__dirname, './tsconfig.json'),
-			tsconfigOverride: {
-				sourcemap: isDev
-			}
-		}),
-		// replaces()
-	],
-	watch: {
-		include: 'src/**',
-		exclude: 'node_modules/**'
-	},
-	// external: Object.keys(pkg.dependencies),
-	output: {
-		banner,
-		sourcemap: isDev,
+const defineBuild = (options) => {
+	return {
+		input: options.input,
+		plugins: [
+			typeScriptPlugin({
+				check: false,
+				tsconfig: path.resolve(__dirname, './tsconfig.json'),
+				tsconfigOverride: {
+					sourcemap: isDev
+				}
+			})
+			// replaces()
+		],
+		watch: {
+			include: 'src/**',
+			exclude: 'node_modules/**'
+		},
+		// external: Object.keys(pkg.dependencies),
+		output: {
+			banner,
+			sourcemap: isDev,
+			file: options.file,
+			format: options.format
+		}
+	};
+};
+
+export default [
+	defineBuild({
+		input: './src/node/server/index.ts',
 		file: './dist/index.js',
 		format: 'cjs'
-	}
-};
+	}),
+	defineBuild({
+		input: './src/client/client.ts',
+		file: './dist/client.js',
+		format: 'esm'
+	})
+];
