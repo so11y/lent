@@ -2,9 +2,12 @@ import { PartialResolvedId } from 'rollup';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
 import { Plugin } from '../../../types/plugin';
-import { Lent } from '..';
+import { Lent } from '../index';
 
 export const tryFsResolve = (fsPath: string, exits: Array<string>) => {
+	if(existsSync(fsPath)){
+		return fsPath
+	}
 	return exits
 		.map((exit) => `$${fsPath}${exit}`)
 		.find((path) => existsSync(path));

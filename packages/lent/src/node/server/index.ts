@@ -40,6 +40,9 @@ export class Lent {
 		return this;
 	}
 	start() {
+		this.config.plugins
+			.filter((plugin) => plugin.serveStart)
+			.forEach((plugin) => plugin.serveStart!(this));
 		this.server.start();
 	}
 }

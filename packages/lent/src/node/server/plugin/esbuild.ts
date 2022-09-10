@@ -9,10 +9,10 @@ export function esbuildPlugin(): Plugin {
 
 	return {
 		name: 'lent:esbuild',
-		enforce:"post",
+		enforce: 'post',
 		async transform(code, id) {
 			if (filter(id) || filter(cleanUrl(id))) {
-				const loader = `.${extname(id)!}` as Loader;
+				const loader = extname(id).slice(1) as Loader;
 				const result = await transform(code, {
 					sourcemap: 'inline',
 					sourcefile: id,
@@ -23,4 +23,3 @@ export function esbuildPlugin(): Plugin {
 		}
 	};
 }
-
