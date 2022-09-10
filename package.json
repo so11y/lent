@@ -1,0 +1,17 @@
+{
+	"name": "lent",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "pnpm -F @lent/lent run dev",
+		"playground":"pnpm -F @lent/playground dev"
+	},
+	"devDependencies": {
+		"@lent/link": "workspace:*",
+		"@lent/lent": "workspace:*"
+	},
+	"dependencies": {
+		"vitest": "^0.23.1"
+	}
+}
