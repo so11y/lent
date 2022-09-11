@@ -4,6 +4,6 @@ if (import.meta.hot) {
 	});
 }
 
+console.log("soso232323");
 
-
-export default "123232312122323aaaa331122"
+export default "1232323112122323aaaa331122"

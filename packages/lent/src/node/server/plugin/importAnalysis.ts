@@ -22,9 +22,6 @@ export const importAnalysisPlugin = (): Plugin => {
 			const s = new MagicString(source);
 			const importers = new Set<string>();
 			importerModule.isSelfAccepting = false;
-			const rewriterUrl = (id: string) => {
-				return resolve(importer, `../${id}`).replace(lent.config.root, '');
-			};
 			if (imports.length) {
 				for (let index = 0; index < imports.length; index++) {
 					const { s: start, e: end } = imports[index];
@@ -44,16 +41,18 @@ export const importAnalysisPlugin = (): Plugin => {
 					}
 					const resolved = await this.resolve(rawUrl, importer);
 					if (resolved) {
-						const url = rewriterUrl(resolved.id);
-						const childModule = await lent.moduleGraph.getModulesByFile(url);
+						const urlWithoutBase = resolved.id.replace(lent.config.root, '');
+						const childModule = await lent.moduleGraph.getModulesByFile(
+							urlWithoutBase
+						);
 						if (childModule && childModule.lastHMRTimestamp) {
 							s.overwrite(
 								start,
 								end,
-								`${resolved.id}?t=${childModule.lastHMRTimestamp}`
+								`${urlWithoutBase}?t=${childModule.lastHMRTimestamp}`
 							);
 						}
-						importers.add(url);
+						importers.add(urlWithoutBase);
 					}
 				}
 				if (importerModule.isSelfAccepting) {
