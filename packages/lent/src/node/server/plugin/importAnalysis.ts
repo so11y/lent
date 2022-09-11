@@ -1,9 +1,83 @@
 import { Plugin } from '../../../types/plugin';
-import { parse, init } from 'es-module-lexer';
+import { parse, init, ImportSpecifier } from 'es-module-lexer';
 import { Lent } from '../index';
-import { handleInternal } from 'src/node/utils';
 import MagicString from 'magic-string';
-import { resolve } from 'path';
+import { ComposeCondition, Mode } from '@lent/link';
+import { ModuleNode } from '../moduleGraph';
+import glob from 'fast-glob';
+import { isExternal } from '../../../node/utils';
+import { join } from 'path';
+
+interface ImportMetaContext {
+	continueHere: boolean;
+	source: string;
+	specifier: ImportSpecifier;
+	s: MagicString;
+	mod: ModuleNode;
+	lent: Lent;
+}
+
+const handleImportMetaHot = {
+	maybe(meta: ImportMetaContext) {
+		const { source, specifier, mod } = meta;
+		const { s: start, e: end } = specifier;
+		const prop = source.slice(end, end + 4);
+		const rawUrl = source.slice(start, end);
+		return (
+			rawUrl === 'import.meta' &&
+			prop === '.hot' &&
+			source.slice(end + 4, end + 11) === '.accept'
+		);
+	},
+	expect(meta: ImportMetaContext) {
+		const { mod } = meta;
+		mod.isSelfAccepting = true;
+	}
+};
+const handleImportGold = {
+	maybe(meta: ImportMetaContext) {
+		const { source, specifier, mod } = meta;
+		const { s: start, e: end } = specifier;
+		const prop = source.slice(end, end + 4);
+		const rawUrl = source.slice(start, end);
+		return (
+			rawUrl === 'import.meta' && prop === '.glo' && source[end + 4] === 'b'
+		);
+	},
+	expect(meta: ImportMetaContext) {
+		const { source, specifier, lent, s } = meta;
+		const { s: start, e: end } = specifier;
+		const globIndex = end + 6;
+		const endIndex = source.indexOf(`)`, globIndex);
+		const globStart = globIndex + 'import.meta.glob('.length + 1;
+		const pattern = source.slice(globStart, endIndex - 1);
+		const files = glob.sync(pattern, {
+			cwd: lent.config.root,
+			ignore: ['**/node_modules/**']
+		});
+		const overwriteCode = new MagicString('');
+		overwriteCode.prepend('{');
+		files.forEach((file) =>
+			overwriteCode.append(`'${file}':()=>import('${file}'),`)
+		);
+		overwriteCode.append('}');
+		s.overwrite(globIndex, endIndex + 1, overwriteCode.toString());
+	}
+};
+
+const overwritePath = (id: string, lent: Lent): [boolean, string] => {
+	if (id.includes('/node_modules/')) {
+		return [true, join('/node_modules/', id)];
+	}
+	return [false, id.replace(lent.config.root, '')];
+};
+
+const handleImportMate = (mate: ImportMetaContext) => {
+	return new ComposeCondition<ImportMetaContext>(Mode.IfElse)
+		.use(handleImportMetaHot)
+		.use(handleImportGold)
+		.run(mate);
+};
 
 export const importAnalysisPlugin = (): Plugin => {
 	let lent: Lent;
@@ -17,7 +91,6 @@ export const importAnalysisPlugin = (): Plugin => {
 			if (importer.endsWith('client.js')) return;
 			await init;
 			const [imports] = parse(source);
-
 			const importerModule = lent.moduleGraph.getModulesByFile(importer)!;
 			const s = new MagicString(source);
 			const importers = new Set<string>();
@@ -26,30 +99,34 @@ export const importAnalysisPlugin = (): Plugin => {
 				for (let index = 0; index < imports.length; index++) {
 					const { s: start, e: end } = imports[index];
 					const rawUrl = source.slice(start, end);
-					if (rawUrl === 'import.meta') {
-						const prop = source.slice(end, end + 4);
-						if (prop === '.hot') {
-							if (source.slice(end + 4, end + 11) === '.accept') {
-								importerModule.isSelfAccepting = true;
-							}
-						}
-						// else if (prop === '.env') {
-						// } else if (prop === '.glo' && source[end + 4] === 'b') {
-						// }
-						// const resolved = await this.resolve(rawUrl, importer)
-						continue;
-					}
+					const importContext: ImportMetaContext = {
+						continueHere: false,
+						source,
+						specifier: imports[index],
+						mod: importerModule,
+						s,
+						lent
+					};
+					handleImportMate(importContext);
+					if (importContext.continueHere) continue;
+					//  if (prop === '.env') {
+					// }
+					// const resolved = await this.resolve(rawUrl, importer)
 					const resolved = await this.resolve(rawUrl, importer);
 					if (resolved) {
-						const urlWithoutBase = resolved.id.replace(lent.config.root, '');
-						const childModule = await lent.moduleGraph.getModulesByFile(
+						const [isExternal, urlWithoutBase] = overwritePath(
+							resolved.id,
+							lent
+						);
+						const childModule = await lent.moduleGraph.ensureEntryFromUrl(
 							urlWithoutBase
 						);
-						if (childModule && childModule.lastHMRTimestamp) {
+						childModule.isExternal = isExternal;
+						if (childModule) {
 							s.overwrite(
 								start,
 								end,
-								`${urlWithoutBase}?t=${childModule.lastHMRTimestamp}`
+								`${urlWithoutBase}${childModule.injectLastHMRTimestamp}`
 							);
 						}
 						importers.add(urlWithoutBase);

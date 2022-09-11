@@ -1,9 +1,9 @@
 if (import.meta.hot) {
 	import.meta.hot.accept(() => {
-		console.log('---');
+		// console.log('---');
 	});
 }
 
-console.log("soso232323");
+console.log("1323212232321121123232131111");
 
-export default "1232323112122323aaaa331122"
+export default "1"

@@ -2,13 +2,13 @@ interface ExpectFn<T> {
 	maybe(value: T): boolean;
 	expect(value: T): void;
 }
-enum Mode {
+export enum Mode {
 	If = 'IF',
 	IfElse = 'IfElse'
 }
 class ExpectLink<T> {
-	public expect: ExpectFn<T>;
-	public next: ExpectLink<T> | null;
+	public expect!: ExpectFn<T>;
+	public next!: ExpectLink<T> | null;
 	private composeConfig: ComposeCondition<T>;
 	constructor(config: ComposeCondition<T>) {
 		this.composeConfig = config;
@@ -30,17 +30,14 @@ class ExpectLink<T> {
 }
 export class ComposeCondition<T> {
 	//前一个节点
-	private prev: ExpectLink<T>;
+	private prev!: ExpectLink<T>;
 	//任务头节点
-	private head: ExpectLink<T>;
-	//入参
-	private value: T;
+	private head!: ExpectLink<T>;
 	//是否锁状态
 	public isLock = false;
 	//当前模式 "if"|"ifElse"
 	public mode: Mode;
-	constructor(value: T, mode: Mode = Mode.If) {
-		this.value = value;
+	constructor(mode: Mode = Mode.If) {
 		this.mode = mode;
 	}
 	public use(fn: ExpectFn<T>) {
@@ -51,7 +48,7 @@ export class ComposeCondition<T> {
 		this.prev = link;
 		return this;
 	}
-	public run() {
-		this.head.runTest(this.value);
+	public run(value: T) {
+		this.head.runTest(value);
 	}
 }

@@ -76,3 +76,10 @@ export const handleInternal = (url: string): [string, boolean] => {
 	}
 	return [removeTimestampQuery(removeImportQuery(url)), isInternal];
 };
+
+export const isExternal = (specifier: string): boolean => {
+	if (specifier) {
+		return specifier[0] !== '.' && specifier[0] !== '/';
+	}
+	return false;
+};

@@ -12,11 +12,15 @@ export class ModuleNode {
 	importedModules = new Set<ModuleNode>();
 	lastHMRTimestamp = 0;
 	isSelfAccepting = false;
+	isExternal = false;
 	etag?: string;
 
 	constructor(url: string) {
 		this.url = url;
 		this.type = url.endsWith('.css') ? 'css' : 'js';
+	}
+	get injectLastHMRTimestamp(): string {
+		return this.lastHMRTimestamp ? `?t=${this.lastHMRTimestamp}` : '';
 	}
 }
 

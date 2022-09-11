@@ -3,12 +3,13 @@ import { Lent } from '../index';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 import { sortUserPlugins } from '../../utils';
+import { Next } from '@lent/link/';
 
 export const indexHtml = (lent: Lent) => {
 	return async (
 		req: http.IncomingMessage,
 		res: http.ServerResponse,
-		next: Function
+		next: Next
 	) => {
 		if (req.url === '/') {
 			const indexPath = join(lent.config.root, './index.html');

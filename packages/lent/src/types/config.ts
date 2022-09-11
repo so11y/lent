@@ -1,4 +1,5 @@
 import type { RollupOptions } from 'rollup';
+import { MiddlewarePlugin } from '../node/server/middlewares/index';
 import { Plugin } from './plugin';
 
 export interface userConfig {
@@ -6,6 +7,7 @@ export interface userConfig {
 	port?: number;
 	root?: string;
 	plugins?: Plugin[];
+	middleware?: Array<MiddlewarePlugin>;
 	build?: {
 		rollupOptions?: RollupOptions;
 	};
@@ -13,7 +15,10 @@ export interface userConfig {
 }
 
 export type LentConfig = Required<
-	Pick<userConfig, 'root' | 'port' | 'build' | 'plugins' | 'extensions'>
+	Pick<
+		userConfig,
+		'middleware' | 'root' | 'port' | 'build' | 'plugins' | 'extensions'
+	>
 >;
 // & {
 // 	userConfig: userConfig | null;

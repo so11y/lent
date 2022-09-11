@@ -75,6 +75,7 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 			'.json',
 			...(config?.extensions || [])
 		],
+		middleware: config?.middleware || [],
 		build: {}
 	};
 	return lentConfig;

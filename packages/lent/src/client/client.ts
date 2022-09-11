@@ -1,6 +1,5 @@
 const dataMap = new Map<string, () => void>();
 const importNewFile = (hotModule: string, time: string) => {
-	console.log(hotModule,'-----');
 	import(`${hotModule}?import&t=${time}`).then(() => {
 		console.log(`[lent hmr] hot update file ${hotModule}`);
 		dataMap.get(hotModule)?.();

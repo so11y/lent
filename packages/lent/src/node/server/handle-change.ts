@@ -12,6 +12,9 @@ export const handelChange = (lent: Lent, path: string, stats?: fs.Stats) => {
 	if (mod) {
 		cleanMod(mod!);
 		const [needReload, updateMod, type] = findUpdateMod(mod);
+		console.log(
+			`[Lent ${type == 'hot' ? 'HMR' : 'WDS'}] update file ${mod.url}`
+		);
 		lent.socket.sendSocket({
 			name: updateMod?.url,
 			type,

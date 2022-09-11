@@ -9,6 +9,7 @@ import { handelChange } from './handle-change';
 import { createSocket } from './ws';
 import { createPluginContainer, PluginContainer } from './pluginContainer';
 import { ModuleGraph } from './moduleGraph';
+import { applyMiddleware, Middleware } from './middlewares';
 
 export class Lent {
 	config!: LentConfig;
@@ -26,10 +27,12 @@ export class Lent {
 	};
 	moduleGraph!: ModuleGraph;
 	pluginContainer!: PluginContainer;
+	middleware!: Middleware;
 	async init(inlineConfig?: userConfig) {
 		this.config = await resolveConfig(inlineConfig);
+		this.middleware = applyMiddleware(this);
 		this.watcher = createWatcher(this.config.root);
-		this.server = httpServer(this.config, this);
+		this.server = httpServer(this);
 		this.socket = createSocket(this);
 		this.pluginContainer = await createPluginContainer(
 			this.config,

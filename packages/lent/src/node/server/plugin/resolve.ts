@@ -1,9 +1,14 @@
 import { PartialResolvedId } from 'rollup';
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 import { existsSync } from 'fs';
 import { Plugin } from '../../../types/plugin';
 import { Lent } from '../index';
-import { cleanInternalUrl, handleInternal } from '../../../node/utils';
+import {
+	cleanInternalUrl,
+	handleInternal,
+	isExternal
+} from '../../../node/utils';
+import { getPackageInfoSync } from 'local-pkg';
 
 export const tryFsResolve = (fsPath: string, exits: Array<string>) => {
 	if (existsSync(fsPath)) {
@@ -12,6 +17,15 @@ export const tryFsResolve = (fsPath: string, exits: Array<string>) => {
 	return exits
 		.map((exit) => `${fsPath}${exit}`)
 		.find((path) => existsSync(path));
+};
+
+const getPckPath = (id: string, root: string) => {
+	const filePackage = getPackageInfoSync(id);
+	if (filePackage) {
+		const fileRoot =
+			filePackage.packageJson.module || filePackage.packageJson.main;
+		return join(root, '/node_modules/', fileRoot);
+	}
 };
 
 export const resolvePlugin = (): Plugin => {
@@ -30,6 +44,14 @@ export const resolvePlugin = (): Plugin => {
 					require.resolve('lent'),
 					`../${cleanInternalUrl(url)}.js`
 				);
+			}
+			if (isExternal(id)) {
+				return getPckPath(id, lent.config.root);
+			}
+			if (id.includes('/node_modules/')) {
+				const splitPath = id.split('/');
+				const modulesIndex = splitPath.findIndex((v) => v === 'node_modules');
+				return getPckPath(splitPath[modulesIndex + 1], lent.config.root);
 			}
 			const fsPath = resolve(importer, `../${id}`);
 			if ((res = tryFsResolve(fsPath, lent.config.extensions))) {
