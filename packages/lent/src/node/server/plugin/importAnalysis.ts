@@ -33,7 +33,7 @@ const handleImportMetaHot = {
 		mod.isSelfAccepting = true;
 	}
 };
-const handleImportGold = {
+const handleImportGlob = {
 	maybe(meta: ImportMetaContext) {
 		const { source, specifier, mod } = meta;
 		const { s: start, e: end } = specifier;
@@ -77,7 +77,7 @@ const overwritePath = (
 const handleImportMate = (mate: ImportMetaContext) => {
 	return new ComposeCondition<ImportMetaContext>(Mode.IfElse)
 		.use(handleImportMetaHot)
-		.use(handleImportGold)
+		.use(handleImportGlob)
 		.run(mate);
 };
 

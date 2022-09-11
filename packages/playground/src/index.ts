@@ -13,7 +13,12 @@
 
 // console.log(1,aa);
 
-import aa from '@/a';
+// import aa from '@/a';
 
-console.log(aa);
-console.log(xxx);
+// console.log(aa);
+// console.log(xxx);
+
+
+// const v =  import.meta.glob("./*.ts");
+
+// console.log(v,'---');
