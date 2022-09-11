@@ -24,7 +24,7 @@ const getPckPath = (id: string, root: string) => {
 	if (filePackage) {
 		const fileRoot =
 			filePackage.packageJson.module || filePackage.packageJson.main;
-		return join(root, '/node_modules/', fileRoot);
+		return resolve(filePackage.packageJsonPath, `../${fileRoot}`);
 	}
 };
 
@@ -39,6 +39,8 @@ export const resolvePlugin = (): Plugin => {
 		resolveId(id: string, importer: string) {
 			let res: string | PartialResolvedId | undefined;
 			const [url, isInternal] = handleInternal(id);
+			const mod = lent.moduleGraph.urlToModuleMap.get(id);
+			if (mod) return mod.file;
 			if (isInternal) {
 				return resolve(
 					require.resolve('lent'),
@@ -49,7 +51,7 @@ export const resolvePlugin = (): Plugin => {
 				return getPckPath(id, lent.config.root);
 			}
 			if (id.includes('/node_modules/')) {
-				const splitPath = id.split('/');
+				const splitPath = id.split('/').filter(Boolean);
 				const modulesIndex = splitPath.findIndex((v) => v === 'node_modules');
 				return getPckPath(splitPath[modulesIndex + 1], lent.config.root);
 			}

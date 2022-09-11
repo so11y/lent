@@ -3,13 +3,13 @@ import {
 	CustomPluginOptions,
 	LoadResult,
 	Plugin as RollupPlugin,
+	PluginContext,
 	ResolveIdResult,
 	TransformPluginContext,
 	TransformResult
 } from 'rollup';
 import { Lent } from 'src/node/server';
 
-export interface PluginContext {}
 
 export interface Plugin extends RollupPlugin {
 	enforce?: 'pre' | 'post';

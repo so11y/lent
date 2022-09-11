@@ -169,7 +169,7 @@ export const createPluginContainer = async (
 				if (skips?.has(plugin)) continue;
 
 				ctx._activePlugin = plugin;
-				const result = await plugin.resolveId.call(ctx, rawId, importer, {});
+				const result = await plugin.resolveId.call(ctx as any, rawId, importer, {});
 				if (!result) continue;
 
 				if (typeof result === 'string') {

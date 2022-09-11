@@ -5,7 +5,6 @@ import MagicString from 'magic-string';
 import { ComposeCondition, Mode } from '@lent/link';
 import { ModuleNode } from '../moduleGraph';
 import glob from 'fast-glob';
-import { isExternal } from '../../../node/utils';
 import { join } from 'path';
 
 interface ImportMetaContext {
@@ -49,8 +48,7 @@ const handleImportGold = {
 		const { s: start, e: end } = specifier;
 		const globIndex = end + 6;
 		const endIndex = source.indexOf(`)`, globIndex);
-		const globStart = globIndex + 'import.meta.glob('.length + 1;
-		const pattern = source.slice(globStart, endIndex - 1);
+		const pattern = source.slice(globIndex + 1, endIndex - 1);
 		const files = glob.sync(pattern, {
 			cwd: lent.config.root,
 			ignore: ['**/node_modules/**']
@@ -61,13 +59,17 @@ const handleImportGold = {
 			overwriteCode.append(`'${file}':()=>import('${file}'),`)
 		);
 		overwriteCode.append('}');
-		s.overwrite(globIndex, endIndex + 1, overwriteCode.toString());
+		s.overwrite(start, endIndex + 1, overwriteCode.toString());
 	}
 };
 
-const overwritePath = (id: string, lent: Lent): [boolean, string] => {
+const overwritePath = (
+	id: string,
+	rawUrl: string,
+	lent: Lent
+): [boolean, string] => {
 	if (id.includes('/node_modules/')) {
-		return [true, join('/node_modules/', id)];
+		return [true, join('/node_modules/', rawUrl)];
 	}
 	return [false, id.replace(lent.config.root, '')];
 };
@@ -116,6 +118,7 @@ export const importAnalysisPlugin = (): Plugin => {
 					if (resolved) {
 						const [isExternal, urlWithoutBase] = overwritePath(
 							resolved.id,
+							rawUrl,
 							lent
 						);
 						const childModule = await lent.moduleGraph.ensureEntryFromUrl(
@@ -126,10 +129,10 @@ export const importAnalysisPlugin = (): Plugin => {
 							s.overwrite(
 								start,
 								end,
-								`${urlWithoutBase}${childModule.injectLastHMRTimestamp}`
+								`${childModule.url}${childModule.injectLastHMRTimestamp}`
 							);
 						}
-						importers.add(urlWithoutBase);
+						importers.add(childModule.url);
 					}
 				}
 				if (importerModule.isSelfAccepting) {

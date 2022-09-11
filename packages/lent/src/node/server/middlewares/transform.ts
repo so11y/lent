@@ -14,11 +14,16 @@ export const transform = (lent: Lent) => {
 			res.statusCode = 304;
 			return res.end();
 		}
-		if(url.endsWith(".map")){
+		if (url.endsWith('.map')) {
 			return res.end();
 		}
-
-		const { code, mod: transformMod } = await doTransform(req.url!, lent);
-		send(req, res, code, transformMod.type, transformMod.etag);
+		try {
+			const { code, mod: transformMod } = await doTransform(req.url!, lent);
+			send(req, res, code, transformMod.type, transformMod.etag);
+		} catch (error) {
+			console.log('[Lent Transform Error]', error);
+			res.statusCode = 500;
+			res.end((error as Error)?.message);
+		}
 	};
 };

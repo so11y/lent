@@ -5,5 +5,10 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "lent"
+	},
+	"devDependencies": {
+		"fake-css": "^0.0.6",
+		"magic-string": "^0.26.3",
+		"vue": "^3.2.39"
 	}
 }
