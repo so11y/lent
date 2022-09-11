@@ -42,17 +42,14 @@ const cleanMod = (mod: ModuleNode) => {
 };
 
 const findUpdateMod = (mod: ModuleNode): [boolean, ModuleNode?, string?] => {
+	if (mod.isSelfAccepting) {
+		return [true, mod, 'hot'];
+	}
 	if (!mod.importers.size) {
 		return [true, mod, 'full-reload'];
 	}
-	const walkParentMod = (mod: ModuleNode): [boolean, ModuleNode?, string?] => {
-		if (mod.isSelfAccepting) {
-			return [true, mod, 'hot'];
-		}
-		for (const parentMod of mod.importers) {
-			return walkParentMod(parentMod);
-		}
-		return [false];
-	};
-	return walkParentMod(mod);
+	for (const parentMod of mod.importers) {
+		return findUpdateMod(parentMod);
+	}
+	return [false];
 };

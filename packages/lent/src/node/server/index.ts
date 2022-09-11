@@ -5,7 +5,7 @@ import { resolveConfig } from './config';
 import { httpServer } from './http';
 import { createWatcher } from './watcher';
 import { Server, WebSocket } from 'ws';
-import { handelChange } from './handle-change';
+import { handelChange } from './handleChange';
 import { createSocket } from './ws';
 import { createPluginContainer, PluginContainer } from './pluginContainer';
 import { ModuleGraph } from './moduleGraph';
