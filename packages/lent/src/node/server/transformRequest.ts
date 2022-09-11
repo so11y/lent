@@ -28,7 +28,6 @@ export const doTransform = async (rawUrl: string, lent: Lent) => {
 		'code'
 	);
 
-
 	// ensureWatchedFile(lent.watcher, mod.file, lent.config.root);
 	mod.etag = getEtag(code, { weak: true });
 	return {

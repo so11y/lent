@@ -1,11 +1,17 @@
 import { LentConfig } from '../../types/config';
-import { PluginContext, Plugin } from '../../types/plugin';
+import { Plugin } from '../../types/plugin';
 import * as acorn from 'acorn';
 import {
 	InputOptions,
 	LoadResult,
+	MinimalPluginContext,
+	ModuleInfo,
+	ModuleOptions,
+	PartialNull,
 	PartialResolvedId,
+	PluginContext as RollupPluginContext,
 	ResolvedId,
+	RollupError,
 	SourceDescription,
 	TransformResult
 } from 'rollup';
@@ -14,6 +20,18 @@ import { ensureWatchedFile } from './watcher';
 import { join } from 'path';
 import { isObject, normalizePath, sortUserPlugins } from '../utils';
 
+type PluginContext = Omit<
+	RollupPluginContext,
+	| 'load'
+	| 'cache'
+	| 'emitAsset'
+	| 'emitChunk'
+	| 'getAssetFileName'
+	| 'getChunkFileName'
+	| 'isExternal'
+	| 'moduleIds'
+	| 'resolveId'
+>;
 export interface PluginContainer {
 	options: InputOptions;
 	buildStart(options: InputOptions): Promise<void>;
@@ -33,9 +51,11 @@ export const createPluginContainer = async (
 ): Promise<PluginContainer> => {
 	const MODULES = new Map();
 	const watchFiles = new Set<string>();
-
 	class Context implements PluginContext {
-		meta = {};
+		meta: MinimalPluginContext['meta'] = {
+			rollupVersion: '2.79.0',
+			watchMode: true
+		};
 		_activePlugin: Plugin | null;
 		_activeId: string | null = null;
 		_activeCode: string | null = null;
@@ -108,12 +128,12 @@ export const createPluginContainer = async (
 			return '';
 		}
 
-		warn(e: string) {
+		warn(e: string | RollupError) {
 			console.warn(`warn`, e);
 		}
 
-		error(e: string) {
-			console.error(`error`, e);
+		error(e: string | RollupError): never {
+			throw e;
 		}
 	}
 	class TransformContext extends Context {
@@ -169,7 +189,12 @@ export const createPluginContainer = async (
 				if (skips?.has(plugin)) continue;
 
 				ctx._activePlugin = plugin;
-				const result = await plugin.resolveId.call(ctx as any, rawId, importer, {});
+				const result = await plugin.resolveId.call(
+					ctx as any,
+					rawId,
+					importer,
+					{}
+				);
 				if (!result) continue;
 
 				if (typeof result === 'string') {
