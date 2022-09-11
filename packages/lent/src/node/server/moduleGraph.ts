@@ -23,6 +23,10 @@ export class ModuleNode {
 export class ModuleGraph {
 	urlToModuleMap = new Map<string, ModuleNode>();
 	idToModuleMap = new Map<string, ModuleNode>();
+	// vite中也许是这里标准化子模块path路径
+	// 可能是有不可避免的重复 比如 代码中是 ./a  浏览器请求是/a
+	// 如果是多层的 ../../../a 也许处理的没有那么完美
+	// 所以可能有重复的url模块,然后都是对应的一个真正文件path
 	fileToModulesMap = new Map<string, ModuleNode>();
 	container: PluginContainer;
 
