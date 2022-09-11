@@ -4,6 +4,7 @@ import { join } from 'path';
 import { readFileSync } from 'fs';
 import { sortUserPlugins } from '../../utils';
 import { Next } from '@lent/link/';
+import { send } from '../send';
 
 export const indexHtml = (lent: Lent) => {
 	return async (
@@ -22,7 +23,7 @@ export const indexHtml = (lent: Lent) => {
 				return prev.then((code) => next.transformIndexHtml!(code));
 			}, Promise.resolve(readFileSync(indexPath).toString()));
 
-			return res.end(htmlCode);
+			return send(req, res, htmlCode, 'html');
 		}
 		next();
 	};
