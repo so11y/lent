@@ -10,10 +10,11 @@ export class ModuleNode {
 	type: 'js' | 'css';
 	importers = new Set<ModuleNode>();
 	importedModules = new Set<ModuleNode>();
-	// lastHMRTimestamp = 0;
+	lastHMRTimestamp = 0;
+	isSelfAccepting = false;
 	etag?: string;
 
-	constructor(url: string,) {
+	constructor(url: string) {
 		this.url = url;
 		this.type = url.endsWith('.css') ? 'css' : 'js';
 	}
@@ -22,7 +23,7 @@ export class ModuleNode {
 export class ModuleGraph {
 	urlToModuleMap = new Map<string, ModuleNode>();
 	idToModuleMap = new Map<string, ModuleNode>();
-	fileToModulesMap = new Map<string, Set<ModuleNode>>();
+	fileToModulesMap = new Map<string, ModuleNode>();
 	container: PluginContainer;
 
 	constructor(container: PluginContainer) {
@@ -38,48 +39,37 @@ export class ModuleGraph {
 		return this.idToModuleMap.get(removeTimestampQuery(id));
 	}
 
-	getModulesByFile(file: string): Set<ModuleNode> | undefined {
+	getModulesByFile(file: string): ModuleNode | undefined {
 		return this.fileToModulesMap.get(file);
 	}
 
-	// async updateModuleInfo(
-	// 	mod: ModuleNode,
-	// 	importedModules: Set<string | ModuleNode>,
-	// 	acceptedModules: Set<string | ModuleNode>,
-	// ): Promise<Set<ModuleNode> | undefined> {
-	// 	const prevImports = mod.importedModules;
-	// 	const nextImports = (mod.importedModules = new Set());
-	// 	let noLongerImported: Set<ModuleNode> | undefined;
-	// 	// update import graph
-	// 	for (const imported of importedModules) {
-	// 		const dep =
-	// 			typeof imported === 'string'
-	// 				? await this.ensureEntryFromUrl(imported)
-	// 				: imported;
-	// 		dep.importers.add(mod);
-	// 		nextImports.add(dep);
-	// 	}
-	// 	// remove the importer from deps that were imported but no longer are.
-	// 	prevImports.forEach((dep) => {
-	// 		if (!nextImports.has(dep)) {
-	// 			dep.importers.delete(mod);
-	// 			if (!dep.importers.size) {
-	// 				// dependency no longer imported
-	// 				(noLongerImported || (noLongerImported = new Set())).add(dep);
-	// 			}
-	// 		}
-	// 	});
-	// 	// update accepted hmr deps
-	// 	const deps = new Set();
-	// 	for (const accepted of acceptedModules) {
-	// 		const dep =
-	// 			typeof accepted === 'string'
-	// 				? await this.ensureEntryFromUrl(accepted)
-	// 				: accepted;
-	// 		deps.add(dep);
-	// 	}
-	// 	return noLongerImported;
-	// }
+	async updateModuleInfo(
+		mod: ModuleNode,
+		importedModules: Set<string | ModuleNode>
+	): Promise<Set<ModuleNode> | undefined> {
+		const prevImports = mod.importedModules;
+		const nextImports = (mod.importedModules = new Set());
+		let noLongerImported: Set<ModuleNode> | undefined;
+
+		for (const imported of importedModules) {
+			const dep =
+				typeof imported === 'string'
+					? await this.ensureEntryFromUrl(imported)
+					: imported;
+			dep.importers.add(mod);
+			nextImports.add(dep);
+		}
+
+		prevImports.forEach((dep) => {
+			if (!nextImports.has(dep)) {
+				dep.importers.delete(mod);
+				if (!dep.importers.size) {
+					(noLongerImported || (noLongerImported = new Set())).add(dep);
+				}
+			}
+		});
+		return noLongerImported;
+	}
 
 	async ensureEntryFromUrl(rawUrl: string): Promise<ModuleNode> {
 		const [url, resolvedId] = await this.resolveUrl(rawUrl);
@@ -92,10 +82,8 @@ export class ModuleGraph {
 			const file = (mod.file = cleanUrl(resolvedId));
 			let fileMappedModules = this.fileToModulesMap.get(file);
 			if (!fileMappedModules) {
-				fileMappedModules = new Set();
-				this.fileToModulesMap.set(file, fileMappedModules);
+				this.fileToModulesMap.set(file, mod);
 			}
-			fileMappedModules.add(mod);
 		}
 		return mod;
 	}

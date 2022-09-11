@@ -10,7 +10,7 @@ export const tryFsResolve = (fsPath: string, exits: Array<string>) => {
 		return fsPath;
 	}
 	return exits
-		.map((exit) => `$${fsPath}${exit}`)
+		.map((exit) => `${fsPath}${exit}`)
 		.find((path) => existsSync(path));
 };
 
@@ -22,7 +22,7 @@ export const resolvePlugin = (): Plugin => {
 		serveStart(lentInstance) {
 			lent = lentInstance;
 		},
-		resolveId(id: string) {
+		resolveId(id: string, importer: string) {
 			let res: string | PartialResolvedId | undefined;
 			const [url, isInternal] = handleInternal(id);
 			if (isInternal) {
@@ -31,7 +31,7 @@ export const resolvePlugin = (): Plugin => {
 					`../${cleanInternalUrl(url)}.js`
 				);
 			}
-			const fsPath = resolve(lent.config.root, id.slice(1));
+			const fsPath = resolve(importer, `../${id}`);
 			if ((res = tryFsResolve(fsPath, lent.config.extensions))) {
 				return res;
 			}

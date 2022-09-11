@@ -18,6 +18,7 @@
 		"@types/cheerio": "^0.22.31",
 		"@types/etag": "^1.8.1",
 		"@types/ws": "^8.5.3",
+		"es-module-lexer": "^1.0.3",
 		"local-pkg": "^0.4.2",
 		"rollup": "^2.79.0",
 		"rollup-plugin-typescript2": "^0.33.0",

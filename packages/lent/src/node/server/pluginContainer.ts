@@ -156,7 +156,7 @@ export const createPluginContainer = async (
 		async resolveId(
 			rawId: string,
 			importer = join(root, 'index.html'),
-			skips: any
+			skips: Set<Plugin> | undefined
 		) {
 			const ctx = new Context();
 			ctx._resolveSkips = skips;

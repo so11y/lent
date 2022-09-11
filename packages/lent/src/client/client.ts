@@ -1,6 +1,6 @@
 const dataMap = new Map<string, () => void>();
-const importNewFile = (hotModule: string) => {
-	import(`${hotModule}?import&t=${Date.now()}`).then(() => {
+const importNewFile = (hotModule: string, time: string) => {
+	import(`${hotModule}?import&t=${time}`).then(() => {
 		console.log(`[lent hmr] hot update file ${hotModule}`);
 		dataMap.get(hotModule)?.();
 	});
@@ -14,19 +14,22 @@ const importNewFile = (hotModule: string) => {
 	});
 	ws.addEventListener('message', (msg) => {
 		try {
-			const { hotModule, hot } = JSON.parse(msg.data);
-			if (hot) {
-				const getParents = hotModule.parent.filter((v: any) => dataMap.has(v));
-				const findLatelyHotParent = getParents[getParents.length - 1];
-				// eslint-disable-next-line no-empty
-				if (hotModule.fileName && dataMap.has(hotModule.fileName)) {
-					importNewFile(hotModule.fileName);
-				} else if (findLatelyHotParent) {
-					importNewFile(findLatelyHotParent);
+			const { type, hot, name, time } = JSON.parse(msg.data);
+			if (type === 'full-reload') {
+				window.location.reload();
+			} else if (hot) {
+				if (name) {
+					importNewFile(name, time);
 				} else {
 					window.location.reload();
 				}
 			}
+			// if (hot) {
+			// 	const getParents = hotModule.parent.filter((v: any) => dataMap.has(v));
+			// 	const findLatelyHotParent = getParents[getParents.length - 1];
+			// 	// eslint-disable-next-line no-empty
+
+			// }
 		} catch (error) {
 			console.log(console.log('[lent] message error'));
 		}

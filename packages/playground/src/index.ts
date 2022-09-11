@@ -1,6 +1,8 @@
-console.log("---2323-");
+import aa from './a';
 
-
-let a:number = 11;
-
-console.log(a);
+console.log(aa, '---');
+if (import.meta.hot) {
+	import.meta.hot.accept(() => {
+		console.log('---');
+	});
+}

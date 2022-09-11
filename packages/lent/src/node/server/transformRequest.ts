@@ -21,12 +21,14 @@ export const doTransform = async (rawUrl: string, lent: Lent) => {
 	if (loadResult === null) {
 		throw new Error(`[lent error] loadResult null ${url}`);
 	}
+	const mod = await lent.moduleGraph.ensureEntryFromUrl(url);
+
 	const code = getMaybeValue(
 		await lent.pluginContainer.transform(loadResult, filePath),
 		'code'
 	);
 
-	const mod = await lent.moduleGraph.ensureEntryFromUrl(url);
+
 	// ensureWatchedFile(lent.watcher, mod.file, lent.config.root);
 	mod.etag = getEtag(code, { weak: true });
 	return {
