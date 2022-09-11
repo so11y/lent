@@ -12,3 +12,8 @@
 // }
 
 // console.log(1,aa);
+
+import aa from '@/a';
+
+console.log(aa);
+console.log(xxx);

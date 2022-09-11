@@ -15,7 +15,7 @@ export interface userConfig {
 	};
 	extensions?: Array<string>;
 	resolve?: {
-		alias?: Alias[];
+		alias?: readonly Alias[] | { [find: string]: string };
 	};
 }
 
