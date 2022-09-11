@@ -4,16 +4,17 @@ import { cleanUrl } from '../../../node/utils';
 import { Lent } from '../index';
 import { build } from 'esbuild';
 
-const buildModuleFile = async (absWorkingDir: string, fileName: string) => {
+const buildModuleFile = async (lent: Lent, fileName: string) => {
 	const result = await build({
-		absWorkingDir,
+		absWorkingDir: lent.config.root,
 		entryPoints: [fileName],
 		write: false,
 		platform: 'node',
 		bundle: true,
 		format: 'esm',
 		sourcemap: false,
-		metafile: true
+		metafile: true,
+		define: lent.config.define
 	});
 	const { text } = result.outputFiles[0];
 	return text;
@@ -30,7 +31,7 @@ export const loadFilePlugin = (): Plugin => {
 		async load(id: string) {
 			const mod = lent.moduleGraph.getModulesByFile(id);
 			if (mod?.isExternal) {
-				return await buildModuleFile(lent.config.root, id);
+				return await buildModuleFile(lent, id);
 			}
 			if (id && existsSync(id)) {
 				return readFileSync(cleanUrl(id)).toString();

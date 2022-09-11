@@ -1,3 +1,4 @@
+import { Alias } from '@rollup/plugin-alias';
 import type { RollupOptions } from 'rollup';
 import { MiddlewarePlugin } from '../node/server/middlewares/index';
 import { Plugin } from './plugin';
@@ -8,16 +9,28 @@ export interface userConfig {
 	root?: string;
 	plugins?: Plugin[];
 	middleware?: Array<MiddlewarePlugin>;
+	define?: Record<string, string>;
 	build?: {
 		rollupOptions?: RollupOptions;
 	};
 	extensions?: Array<string>;
+	resolve?: {
+		alias?: Alias[];
+	};
 }
 
 export type LentConfig = Required<
 	Pick<
 		userConfig,
-		'middleware' | 'root' | 'port' | 'build' | 'plugins' | 'extensions'
+		| 'plugins'
+		| 'resolve'
+		| 'middleware'
+		| 'root'
+		| 'port'
+		| 'build'
+		| 'plugins'
+		| 'extensions'
+		| 'define'
 	>
 >;
 // & {

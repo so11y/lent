@@ -65,7 +65,16 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 	const lentConfig: LentConfig = {
 		port: config?.port || 3000,
 		root: join(process.cwd(), config?.root || '/'),
-		plugins: [...resolvePlugins()],
+		define: Object.assign(
+			{
+				'process.env.NODE_ENV': 'development'
+			},
+			config?.define || {}
+		),
+		resolve: {
+			alias: config?.resolve?.alias || []
+		},
+		plugins: config?.plugins || [],
 		extensions: [
 			'.mjs',
 			'.js',
@@ -78,6 +87,7 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 		middleware: config?.middleware || [],
 		build: {}
 	};
+	lentConfig.plugins = resolvePlugins(lentConfig || {});
 	return lentConfig;
 };
 

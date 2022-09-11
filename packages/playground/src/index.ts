@@ -1,14 +1,14 @@
-import aa from './a';
-// import mg from 'magic-string';
+// import aa from './a';
+// // import mg from 'magic-string';
 
-// console.log(aa, '---',mg);
+// // console.log(aa, '---',mg);
 
-// const v = import.meta.glob('./*.ts');
+// // const v = import.meta.glob('./*.ts');
 
-if (import.meta.hot) {
-	import.meta.hot.accept(() => {
-		// console.log('---');
-	});
-}
+// if (import.meta.hot) {
+// 	import.meta.hot.accept(() => {
+// 		// console.log('---');
+// 	});
+// }
 
-console.log(1,aa);
+// console.log(1,aa);

@@ -11,6 +11,7 @@
 		"name": "zrrz",
 		"email": "247076126@qq.com"
 	},
+	"types": "./dist/lent/src/node/server/index.d.ts",
 	"license": "ISC",
 	"devDependencies": {
 		"@rollup/plugin-replace": "^4.0.0",
@@ -18,21 +19,21 @@
 		"@types/cheerio": "^0.22.31",
 		"@types/etag": "^1.8.1",
 		"@types/ws": "^8.5.3",
-		"es-module-lexer": "^1.0.3",
-		"local-pkg": "^0.4.2",
 		"rollup": "^2.79.0",
 		"rollup-plugin-typescript2": "^0.33.0",
-		"typescript": "^4.8.3"
-	},
-	"dependencies": {
-		"acorn": "^8.8.0",
+		"typescript": "^4.8.3",
+		"@rollup/plugin-alias": "^3.1.9",
+		"es-module-lexer": "^1.0.3",
+		"local-pkg": "^0.4.2",
 		"cheerio": "1.0.0-rc.12",
+		"esbuild": "^0.15.7",
+		"magic-string": "^0.26.3",
+		"acorn": "^8.8.0",
 		"chokidar": "^3.5.3",
 		"cross-env": "^7.0.3",
-		"esbuild": "^0.15.7",
 		"etag": "^1.8.1",
 		"fast-glob": "^3.2.12",
-		"magic-string": "^0.26.3",
 		"ws": "^8.8.1"
-	}
+	},
+	"dependencies": {}
 }

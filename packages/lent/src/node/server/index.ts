@@ -11,6 +11,10 @@ import { createPluginContainer, PluginContainer } from './pluginContainer';
 import { ModuleGraph } from './moduleGraph';
 import { applyMiddleware, Middleware } from './middlewares';
 
+export const defineConfig = (config: userConfig): userConfig => {
+	return config;
+};
+
 export class Lent {
 	config!: LentConfig;
 	watcher!: FSWatcher;
