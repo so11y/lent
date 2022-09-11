@@ -3,6 +3,7 @@ import { parse, init } from 'es-module-lexer';
 import { Lent } from '../index';
 import { handleInternal } from 'src/node/utils';
 import MagicString from 'magic-string';
+import { resolve } from 'path';
 
 export const importAnalysisPlugin = (): Plugin => {
 	let lent: Lent;
@@ -13,16 +14,20 @@ export const importAnalysisPlugin = (): Plugin => {
 			lent = lentInstance;
 		},
 		async transform(source, importer) {
+			if (importer.endsWith('client.js')) return;
 			await init;
 			const [imports] = parse(source);
 
 			const importerModule = lent.moduleGraph.getModulesByFile(importer)!;
 			const s = new MagicString(source);
 			const importers = new Set<string>();
-
+			importerModule.isSelfAccepting = false;
+			const rewriterUrl = (id: string) => {
+				return resolve(importer, `../${id}`).replace(lent.config.root, '');
+			};
 			if (imports.length) {
 				for (let index = 0; index < imports.length; index++) {
-					const { s: start, e: end, n: specifier } = imports[index];
+					const { s: start, e: end } = imports[index];
 					const rawUrl = source.slice(start, end);
 					if (rawUrl === 'import.meta') {
 						const prop = source.slice(end, end + 4);
@@ -37,20 +42,18 @@ export const importAnalysisPlugin = (): Plugin => {
 						// const resolved = await this.resolve(rawUrl, importer)
 						continue;
 					}
-					const [url] = handleInternal(rawUrl);
 					const resolved = await this.resolve(rawUrl, importer);
 					if (resolved) {
-						const childModule = await lent.moduleGraph.getModuleByUrl(
-							resolved.id
-						);
-						if (childModule && childModule.etag) {
+						const url = rewriterUrl(resolved.id);
+						const childModule = await lent.moduleGraph.getModulesByFile(url);
+						if (childModule && childModule.lastHMRTimestamp) {
 							s.overwrite(
 								start,
 								end,
-								`${resolved}?t=${childModule.lastHMRTimestamp}`
+								`${resolved.id}?t=${childModule.lastHMRTimestamp}`
 							);
 						}
-						importers.add(resolved.id);
+						importers.add(url);
 					}
 				}
 				if (importerModule.isSelfAccepting) {
