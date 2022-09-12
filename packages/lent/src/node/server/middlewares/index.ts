@@ -14,7 +14,7 @@ export interface MiddlewarePlugin {
 		req: http.IncomingMessage,
 		res: http.ServerResponse,
 		next: Next
-	) => Promise<void>;
+	) => void | Promise<void>;
 }
 
 export const applyMiddleware = (lent: Lent) => {

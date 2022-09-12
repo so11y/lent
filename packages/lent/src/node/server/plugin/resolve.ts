@@ -53,7 +53,7 @@ export const resolvePlugin = (): Plugin => {
 			if (id.includes('/node_modules/')) {
 				const splitPath = id.split('/').filter(Boolean);
 				const modulesIndex = splitPath.findIndex((v) => v === 'node_modules');
-				return getPckPath(splitPath[modulesIndex + 1], lent.config.root);
+			  return getPckPath(splitPath.slice(modulesIndex + 1).join("/"), lent.config.root);
 			}
 			const fsPath = resolve(importer, `../${id}`);
 			if ((res = tryFsResolve(fsPath, lent.config.extensions))) {

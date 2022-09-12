@@ -9,7 +9,9 @@ import { handelChange } from './handleChange';
 import { createSocket } from './ws';
 import { createPluginContainer, PluginContainer } from './pluginContainer';
 import { ModuleGraph } from './moduleGraph';
-import { applyMiddleware, Middleware } from './middlewares';
+import { applyMiddleware, Middleware, MiddlewarePlugin } from './middlewares';
+
+export { MiddlewarePlugin, Middleware, LentConfig, userConfig };
 
 export const defineConfig = (config: userConfig): userConfig => {
 	return config;
