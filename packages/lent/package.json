@@ -1,6 +1,6 @@
 {
 	"name": "lent",
-	"version": "2.0.7-bete",
+	"version": "2.0.8-bete",
 	"description": "",
 	"main": "./dist/index.js",
 	"scripts": {

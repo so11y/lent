@@ -1,4 +1,3 @@
-import { LentConfig } from './config';
 import {
 	CustomPluginOptions,
 	LoadResult,
@@ -8,7 +7,7 @@ import {
 	TransformPluginContext,
 	TransformResult
 } from 'rollup';
-import { Lent } from 'src/node/server';
+import { Lent } from '../node/server/index';
 export type ServerHook = (
 	lent: Lent
 ) => (() => void) | void | Promise<(() => void) | void>;
