@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "pnpm -F lent run dev",
+		"build": "pnpm -F lent run build",
 		"playground": "pnpm -F @lent/playground dev"
 	},
 	"devDependencies": {

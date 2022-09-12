@@ -1,10 +1,11 @@
 {
 	"name": "lent",
-	"version": "1.5.4",
+	"version": "2.0.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"scripts": {
-		"dev": "cross-env LENT_DEV=dev rollup --config --watch"
+		"dev": "cross-env LENT_DEV=dev rollup --config --watch",
+		"build": "cross-env LENT_DEV=dev rollup --config"
 	},
 	"bin": "./bin/index.js",
 	"author": {
@@ -13,9 +14,9 @@
 	},
 	"files": [
 		"bin",
-    "dist",
-    "client.d.ts",
-    "types"
+		"dist",
+		"client.d.ts",
+		"types"
 	],
 	"types": "./dist/lent/src/node/server/index.d.ts",
 	"license": "ISC",
