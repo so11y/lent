@@ -10,8 +10,8 @@ import { createSocket } from './ws';
 import { createPluginContainer, PluginContainer } from './pluginContainer';
 import { ModuleGraph } from './moduleGraph';
 import { applyMiddleware, Middleware, MiddlewarePlugin } from './middlewares';
-
-export { MiddlewarePlugin, Middleware, LentConfig, userConfig };
+import { Plugin } from '../../types/plugin';
+export { MiddlewarePlugin, Middleware, LentConfig, userConfig, Plugin };
 
 export const defineConfig = (config: userConfig): userConfig => {
 	return config;
