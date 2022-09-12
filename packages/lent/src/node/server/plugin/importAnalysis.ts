@@ -86,7 +86,7 @@ export const importAnalysisPlugin = (): Plugin => {
 	return {
 		name: 'lent:importAnalysis',
 		enforce: 'post',
-		serveStart(lentInstance) {
+		configureServer(lentInstance) {
 			lent = lentInstance;
 		},
 		async transform(source, importer) {

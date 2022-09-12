@@ -11,7 +11,7 @@ export function esbuildPlugin(): Plugin {
 	return {
 		name: 'lent:esbuild',
 		enforce: 'post',
-		serveStart(lentInstance) {
+		configureServer(lentInstance) {
 			lent = lentInstance;
 		},
 		async transform(code, id) {

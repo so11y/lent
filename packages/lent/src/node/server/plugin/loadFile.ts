@@ -25,7 +25,7 @@ export const loadFilePlugin = (): Plugin => {
 	return {
 		name: 'lent:loadFile',
 		enforce: 'post',
-		serveStart(lentInstance) {
+		configureServer(lentInstance) {
 			lent = lentInstance;
 		},
 		async load(id: string) {

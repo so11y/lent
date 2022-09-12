@@ -7,7 +7,7 @@ export const clientPlugin = (): Plugin => {
 	return {
 		name: 'lent:client',
 		enforce: 'pre',
-		serveStart(lentInstance) {
+		configureServer(lentInstance) {
 			lent = lentInstance;
 		},
 		transform(code: string, id: string) {

@@ -24,12 +24,6 @@ const importNewFile = (hotModule: string, time: string) => {
 					window.location.reload();
 				}
 			}
-			// if (hot) {
-			// 	const getParents = hotModule.parent.filter((v: any) => dataMap.has(v));
-			// 	const findLatelyHotParent = getParents[getParents.length - 1];
-			// 	// eslint-disable-next-line no-empty
-
-			// }
 		} catch (error) {
 			console.log(console.log('[lent] message error'));
 		}

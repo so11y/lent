@@ -33,7 +33,7 @@ export const resolvePlugin = (): Plugin => {
 	return {
 		name: 'lent:resolve',
 		enforce: 'post',
-		serveStart(lentInstance) {
+		configureServer(lentInstance) {
 			lent = lentInstance;
 		},
 		resolveId(id: string, importer: string) {

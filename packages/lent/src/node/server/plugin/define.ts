@@ -6,7 +6,7 @@ export const definePlugin = (): Plugin => {
 	return {
 		name: 'lent:define',
 		enforce: 'pre',
-		serveStart(lentInstance) {
+		configureServer(lentInstance) {
 			lent = lentInstance;
 		},
 		transform(code) {

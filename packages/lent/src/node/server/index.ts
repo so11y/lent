@@ -48,10 +48,17 @@ export class Lent {
 		this.watcher.on('change', (path, stats) => handelChange(this, path, stats));
 		return this;
 	}
-	start() {
-		this.config.plugins
-			.filter((plugin) => plugin.serveStart)
-			.forEach((plugin) => plugin.serveStart!(this));
+	async start() {
+		const configureServerHooks = this.config.plugins.filter(
+			(plugin) => plugin.configureServer
+		);
+
+		await configureServerHooks.reduce((prev, next) => {
+			return prev.then(async () => {
+				return (await next.configureServer!(this)) as void;
+			});
+		}, Promise.resolve());
+
 		this.server.start();
 	}
 }
