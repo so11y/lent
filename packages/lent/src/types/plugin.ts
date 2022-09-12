@@ -9,12 +9,15 @@ import {
 	TransformResult
 } from 'rollup';
 import { Lent } from 'src/node/server';
-
+export type ServerHook = (
+	lent: Lent
+) => (() => void) | void | Promise<(() => void) | void>;
 
 export interface Plugin extends RollupPlugin {
 	enforce?: 'pre' | 'post';
-	serveStart?: (config: Lent) => void;
-	configResolved?: (config: LentConfig) => void | Promise<void>;
+	// serveStart?: (config: Lent) => void;
+	// configResolved?: (lent: Lent) => void | Promise<void>;
+	configureServer?: ServerHook;
 	transformIndexHtml?: (html: string) => Promise<string> | string;
 	resolveId?(
 		this: PluginContext,
