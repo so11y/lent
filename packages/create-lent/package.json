@@ -1,0 +1,14 @@
+{
+	"name": "create-lent",
+	"version": "1.0.1",
+	"description": "",
+	"main": "index.js",
+	"bin": "./bin/index.js",
+	"author": {
+		"name": "zrrz",
+		"email": "247076126@qq.com"
+	},
+	"dependencies": {
+		"ejs": "^3.1.6"
+	}
+}

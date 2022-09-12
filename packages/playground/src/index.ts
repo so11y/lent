@@ -22,3 +22,8 @@
 // const v =  import.meta.glob("./*.ts");
 
 // console.log(v,'---');
+
+// import value from "xixi";
+
+
+// console.log(value);

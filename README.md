@@ -11,19 +11,20 @@
 1. 自定义插件
 2. 中间件
 3. 热更新
-4. glob导入
-5. 开箱即用的typescript
+4. glob 导入
+5. 开箱即用的 typescript
 6. env
 
 ---
 
 ### 获取模板
 
-1. npx lent template (--leetcode or --js --ts)
+1. npm create lent
 
 ---
 
-### leetcode模板内置了对于树和链表的数据生成
-1. 使用以下接口可以修改port
+### leetcode 模板内置了对于树和链表的数据生成
+
+1. 使用以下接口可以修改 port
 2. localhost:3000/leetcode?type=tree&demo=[1,2,3]
 3. localhost:3000/leetcode?type=listnode&demo=[1,2,3]

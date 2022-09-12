@@ -11,6 +11,12 @@
 		"name": "zrrz",
 		"email": "247076126@qq.com"
 	},
+	"files": [
+		"bin",
+    "dist",
+    "client.d.ts",
+    "types"
+	],
 	"types": "./dist/lent/src/node/server/index.d.ts",
 	"license": "ISC",
 	"devDependencies": {

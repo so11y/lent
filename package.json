@@ -5,10 +5,11 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "pnpm -F lent run dev",
-		"playground":"pnpm -F @lent/playground dev"
+		"playground": "pnpm -F @lent/playground dev"
 	},
 	"devDependencies": {
 		"@lent/link": "workspace:*",
+		"@lent/template": "workspace:*",
 		"lent": "workspace:*"
 	},
 	"dependencies": {
