@@ -19,12 +19,12 @@ export const resolvePlugins = (config: LentConfig): Plugin[] => {
 		definePlugin(),
 		...prePlugins,
 		clientPlugin(),
-		htmlPlugin(),
 		esbuildPlugin(),
 		...normalPlugins,
 		resolvePlugin(),
 		loadFilePlugin(),
 		...postPlugins,
+		htmlPlugin(),
 		importAnalysisPlugin()
 	];
 };
