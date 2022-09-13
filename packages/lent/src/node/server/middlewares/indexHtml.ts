@@ -15,9 +15,9 @@ export const indexHtml = (lent: Lent) => {
 		if (req.url === '/') {
 			const indexPath = join(lent.config.root, './index.html');
 
-			const htmlPlugin = sortUserPlugins(lent.config.plugins).filter(
-				(v) => v.transformIndexHtml
-			);
+			const htmlPlugin = sortUserPlugins(lent.config.plugins)
+				.flat()
+				.filter((v) => v.transformIndexHtml);
 
 			const htmlCode = await htmlPlugin.reduce((prev, next) => {
 				return prev.then((code) => next.transformIndexHtml!(code));
