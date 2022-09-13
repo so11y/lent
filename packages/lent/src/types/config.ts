@@ -14,6 +14,7 @@ export interface userConfig {
 		rollupOptions?: RollupOptions;
 	};
 	extensions?: Array<string>;
+
 	resolve?: {
 		alias?: readonly Alias[] | { [find: string]: string };
 	};
@@ -32,7 +33,6 @@ export type LentConfig = Required<
 		| 'extensions'
 		| 'define'
 	>
->;
-// & {
-// 	userConfig: userConfig | null;
-// };
+> & {
+	configPath: string | null;
+};

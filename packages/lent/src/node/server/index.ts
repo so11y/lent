@@ -23,6 +23,7 @@ export class Lent {
 	server!: {
 		server: http.Server;
 		start: () => void;
+		close: () => Promise<void>;
 	};
 	performance = {
 		startTime: Date.now()
@@ -34,10 +35,13 @@ export class Lent {
 	moduleGraph!: ModuleGraph;
 	pluginContainer!: PluginContainer;
 	middleware!: Middleware;
+	inlineConfig?: userConfig;
+	isRestarted = false;
 	async init(inlineConfig?: userConfig) {
+		this.inlineConfig = inlineConfig;
 		this.config = await resolveConfig(inlineConfig);
 		this.middleware = applyMiddleware(this);
-		this.watcher = createWatcher(this.config.root);
+		this.watcher = createWatcher();
 		this.server = httpServer(this);
 		this.socket = createSocket(this);
 		this.pluginContainer = await createPluginContainer(
@@ -45,7 +49,8 @@ export class Lent {
 			this.watcher
 		);
 		this.moduleGraph = new ModuleGraph(this.pluginContainer);
-		this.watcher.on('change', (path, stats) => handelChange(this, path, stats));
+		if (!this.isRestarted)
+			this.watcher.on('change', (path) => handelChange(this, path));
 		return this;
 	}
 	async start() {
@@ -60,6 +65,20 @@ export class Lent {
 		}, Promise.resolve());
 
 		this.server.start();
+	}
+	async restart() {
+		await this.server.close();
+		let newLent = await new Lent();
+		newLent.isRestarted = true
+		await newLent.init(this.inlineConfig);
+		await newLent.start();
+		for (const key in newLent) {
+			if (key !== 'isRestarted') {
+				// @ts-ignore
+				this[key] = newLent[key];
+			}
+		}
+		return this;
 	}
 }
 

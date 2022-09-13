@@ -2,6 +2,7 @@ import { defineConfig } from 'lent';
 
 export default defineConfig({
 	root: './src',
+	port: 3004,
 	resolve: {
 		alias: {
 			'@': './'

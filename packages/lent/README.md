@@ -27,6 +27,7 @@
 ### leetCode 模板内置了对于树和链表的数据生成
 
 ``` ts
+
 // __lent__inject__ leetcode?type=tree&demo=[22,2,3] done
 const demo0 = new TreeNode(22, new TreeNode(2), new TreeNode(3));
 
@@ -56,5 +57,4 @@ export default defineConfig({
     injectLeetCodePlugin(),
   ],
 });
-
 ```
