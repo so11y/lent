@@ -21,6 +21,7 @@ export function esbuildPlugin(): Plugin {
 					sourcemap: 'inline',
 					sourcefile: id,
 					loader,
+					legalComments:"inline",
 					define: lent.config.define
 				});
 				return result.code;
