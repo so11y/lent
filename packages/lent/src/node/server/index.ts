@@ -40,7 +40,7 @@ export class Lent {
 	async init(inlineConfig?: userConfig) {
 		this.inlineConfig = inlineConfig;
 		this.config = await resolveConfig(inlineConfig);
-		this.middleware = applyMiddleware(this);
+		this.middleware = await applyMiddleware(this);
 		this.watcher = createWatcher();
 		this.server = httpServer(this);
 		this.socket = createSocket(this);
