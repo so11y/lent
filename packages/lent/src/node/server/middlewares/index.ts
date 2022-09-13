@@ -19,16 +19,21 @@ interface MiddlewareUse {
 
 export interface MiddlewarePlugin {
 	(lent: Lent): MiddlewareUse;
-	PostMiddleware?: MiddlewareUse;
+	postMiddleware?: MiddlewareUse;
 }
-
+/**
+ * const demoMiddleware = (lent:Lent) => {
+ * 		const demo = (req,res,next)=>{}
+ * 		demo.PostMiddleware = (req,res,next)=> {}
+ * }
+ */
 export const applyMiddleware = async (lent: Lent) => {
 	const middlewareManagement: Middleware = new ComposeLink();
 	const postMiddleware = [];
 	for (const middleware of lent.config.middleware) {
 		const middle = await middleware(lent);
-		if (middleware.PostMiddleware) {
-			postMiddleware.push(middleware.PostMiddleware);
+		if (middleware.postMiddleware) {
+			postMiddleware.push(middleware.postMiddleware);
 		}
 		middlewareManagement.use(middle);
 	}
