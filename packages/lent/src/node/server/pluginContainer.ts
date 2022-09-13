@@ -15,7 +15,7 @@ import {
 import { FSWatcher } from 'chokidar';
 import { ensureWatchedFile } from './watcher';
 import { join } from 'path';
-import { isObject, normalizePath, sortUserPlugins } from '../utils';
+import { isObject, normalizePath } from '../utils';
 
 type PluginContext = Omit<
 	RollupPluginContext,
@@ -180,8 +180,7 @@ export const createPluginContainer = async (
 
 			let id: string | null = null;
 			const partial: any = {};
-			const plugins_ = sortUserPlugins(plugins);
-			for (const plugin of plugins_) {
+			for (const plugin of plugins) {
 				if (!plugin.resolveId) continue;
 				if (skips?.has(plugin)) continue;
 
@@ -226,8 +225,7 @@ export const createPluginContainer = async (
 
 		async transform(code: string, id: string) {
 			const ctx = new TransformContext(id, code);
-			const plugins_ = sortUserPlugins(plugins);
-			for (const plugin of plugins_) {
+			for (const plugin of plugins) {
 				if (!plugin.transform) continue;
 				ctx._activePlugin = plugin;
 				ctx._activeId = id;
