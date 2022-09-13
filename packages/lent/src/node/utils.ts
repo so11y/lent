@@ -30,7 +30,7 @@ export function isObject(value: unknown): value is Record<string, any> {
 	return Object.prototype.toString.call(value) === '[object Object]';
 }
 
-export function sortUserPlugins(plugins: Plugin[]): Plugin[] {
+export function sortUserPlugins(plugins: Plugin[]): Plugin[][] {
 	const prePlugins: Plugin[] = [];
 	const postPlugins: Plugin[] = [];
 	const normalPlugins: Plugin[] = [];
@@ -40,7 +40,7 @@ export function sortUserPlugins(plugins: Plugin[]): Plugin[] {
 		else normalPlugins.push(p);
 	});
 
-	return [...prePlugins, ...normalPlugins, ...postPlugins];
+	return [prePlugins, normalPlugins, postPlugins];
 }
 
 export const cleanInternalUrl = (url: string): string => {
