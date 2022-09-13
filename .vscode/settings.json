@@ -1,9 +1,11 @@
 {
   "cSpell.words": [
     "esbuild",
+    "leetcode",
     "LENTCONFIGFILENAME",
     "metafile",
     "middlewares",
-    "pluginutils"
+    "pluginutils",
+    "treenode"
   ]
 }

@@ -2,8 +2,8 @@ import chokidar, { FSWatcher } from 'chokidar';
 import { resolve } from 'path';
 import { existsSync } from 'fs';
 
-export const createWatcher = (root: string) => {
-	return chokidar.watch(resolve(root), {
+export const createWatcher = () => {
+	return chokidar.watch(process.cwd(), {
 		ignored: ['**/node_modules/**', '**/.git/**'],
 		ignoreInitial: true,
 		ignorePermissionErrors: true,

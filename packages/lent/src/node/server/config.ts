@@ -61,7 +61,10 @@ async function bundleConfigFile(
 	return text;
 }
 
-const mergeConfig = (config?: userConfig): LentConfig => {
+const mergeConfig = (
+	config?: userConfig,
+	configPath: string | null = null
+): LentConfig => {
 	const lentConfig: LentConfig = {
 		port: config?.port || 3000,
 		root: join(process.cwd(), config?.root || '/'),
@@ -84,6 +87,7 @@ const mergeConfig = (config?: userConfig): LentConfig => {
 			'.json',
 			...(config?.extensions || [])
 		],
+		configPath,
 		middleware: config?.middleware || [],
 		build: {}
 	};
@@ -110,5 +114,5 @@ export async function resolveConfig(
 		const code = await bundleConfigFile(fileName, dir);
 		config = runConfigFile(configPath, code).default;
 	}
-	return mergeConfig(config);
+	return mergeConfig(config, configPath);
 }

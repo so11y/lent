@@ -1,11 +1,11 @@
 {
 	"name": "lent",
-	"version": "2.0.8-bete",
+	"version": "2.1.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"scripts": {
 		"dev": "cross-env LENT_DEV=dev rollup --config --watch",
-		"build": "cross-env LENT_DEV=dev rollup --config"
+		"build": "cross-env LENT_DEV=prod rollup --config"
 	},
 	"bin": "./bin/index.js",
 	"author": {
