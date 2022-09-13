@@ -49,8 +49,7 @@ export class Lent {
 			this.watcher
 		);
 		this.moduleGraph = new ModuleGraph(this.pluginContainer);
-		if (!this.isRestarted)
-			this.watcher.on('change', (path) => handelChange(this, path));
+		this.watcher.on('change', (path) => handelChange(this, path));
 		return this;
 	}
 	async start() {
@@ -67,9 +66,12 @@ export class Lent {
 		this.server.start();
 	}
 	async restart() {
-		await this.server.close();
+		await Promise.all([
+			this.watcher.close(),
+			this.server.close(),
+			this.pluginContainer.close()
+		]);
 		let newLent = await new Lent();
-		newLent.isRestarted = true
 		await newLent.init(this.inlineConfig);
 		await newLent.start();
 		for (const key in newLent) {
