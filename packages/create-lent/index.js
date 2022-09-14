@@ -4,9 +4,11 @@ const path = require('path');
 
 const createTemplate = () => {
 	const root = path.join(process.cwd(), '/src');
-	const renderSrcCode = [
+	const renderSrc = [
 		renderFile('createHtml.ejs', 'index.html'),
-		renderFile('enterFile.ejs', 'index.ts'),
+		renderFile('enterFile.ejs', 'index.ts')
+	];
+	const renderRoot = [
 		renderFile('lent.config.ejs', 'lent.config.ts'),
 		renderFile('tsconfig.ejs', 'tsconfig.json')
 	];
@@ -14,20 +16,23 @@ const createTemplate = () => {
 		console.log('[lent cli] have src path remove to again');
 	} else {
 		fs.mkdirSync(root);
-		renderSrcCode.forEach((v) =>
+		renderSrc.forEach((v) =>
 			fs.writeFileSync(path.join(root, v.fileName), v.source)
+		);
+		renderRoot.forEach((v) =>
+			fs.writeFileSync(path.join(process.cwd(), v.fileName), v.source)
 		);
 		console.log('[lent cli] created template end');
 	}
 };
 
 const renderFile = (filePath, fileName, replace = {}) => {
-	const sourece = fs
+	const source = fs
 		.readFileSync(path.join(__dirname, `./code/${filePath}`))
 		.toString();
 	return {
 		fileName: fileName,
-		source: ejs.render(sourece, replace)
+		source: ejs.render(source, replace)
 	};
 };
 
