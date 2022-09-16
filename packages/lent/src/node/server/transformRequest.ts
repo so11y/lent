@@ -24,7 +24,7 @@ export const doTransform = async (rawUrl: string, lent: Lent) => {
 	const mod = await lent.moduleGraph.ensureEntryFromUrl(url);
 
 	const code = getMaybeValue(
-		await lent.pluginContainer.transform(loadResult, filePath),
+		await lent.pluginContainer.transform(loadResult || '', filePath),
 		'code'
 	);
 
