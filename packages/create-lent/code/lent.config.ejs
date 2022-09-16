@@ -1,5 +1,18 @@
-import { defineConfig } from 'lent';
+import { defineConfig } from "lent";
+import {
+  lentLeetCode,
+  injectLeetCodePlugin,
+  injectQueryPlugin,
+} from "@lent/leet-code";
 
 export default defineConfig({
-	root: './src',
+  port: 3000,
+  root: "./src",
+  middleware: [lentLeetCode],
+  plugins: [
+    injectQueryPlugin({
+      include: "./index.ts",
+    }),
+    injectLeetCodePlugin(),
+  ],
 });

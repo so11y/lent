@@ -10,6 +10,7 @@ export const definePlugin = (): Plugin => {
 			lent = lentInstance;
 		},
 		transform(code) {
+			if (!code) return '';
 			const define = lent.config.define;
 			return Object.keys(lent.config.define).reduce((prevCode, key) => {
 				return prevCode.replace(new RegExp(`/${key}/g`), define[key]);
