@@ -10,7 +10,8 @@ const createTemplate = () => {
 	];
 	const renderRoot = [
 		renderFile('lent.config.ejs', 'lent.config.ts'),
-		renderFile('tsconfig.ejs', 'tsconfig.json')
+		renderFile('tsconfig.ejs', 'tsconfig.json'),
+		renderFile('package.ejs', 'package.json')
 	];
 	if (fs.existsSync(root)) {
 		console.log('[lent cli] have src path remove to again');
