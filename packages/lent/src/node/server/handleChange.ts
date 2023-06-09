@@ -1,8 +1,11 @@
+
+import { normalizePath } from '../utils';
 import { Lent } from './index';
 import { ModuleNode } from './moduleGraph';
 import { readFileSync, statSync } from 'fs';
 
 export const handelChange = async (lent: Lent, file: string) => {
+	file = normalizePath(file);
 	if (file.endsWith('.html')) {
 		return lent.socket.sendSocket({
 			type: 'full-reload'

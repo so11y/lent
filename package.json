@@ -10,7 +10,6 @@
 	},
 	"devDependencies": {
 		"@lent/link": "workspace:*",
-		"@lent/template": "workspace:*",
 		"lent": "workspace:*"
 	},
 	"dependencies": {
